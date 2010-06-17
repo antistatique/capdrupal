@@ -11,26 +11,25 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :scm, :git
   set :deploy_via, :remote_cache
   _cset :branch, "master"
-  _cset :git_enable_submodules, true
-  _cset :runner_group, "www-data"
-
-  _cset(:deploy_to) { "/var/www/#{application}" }
-  _cset :shared_children, ['files']
+  set :git_enable_submodules, true
+  set :runner_group, "www-data"
   
-  _cset(:db_root_password) {
+  set(:deploy_to) { "/var/www/#{application}" }
+  set :shared_children, ['files']
+  
+  set(:db_root_password) {
     Capistrano::CLI.ui.ask("MySQL root password:")
   }
   
-  _cset(:db_username) {
+  set(:db_username) {
     Capistrano::CLI.ui.ask("MySQL username:")
   }
   
-  _cset(:db_password) {
+  set(:db_password) {
     Capistrano::CLI.ui.ask("MySQL password:")
   }
-  
-  after :symlink, "drupal:symlink_shared"
-  after "deploy:setup", "deploy:set_permissions"
+
+  after "deploy:symlink", "drupal:symlink_shared"
   after "deploy:setup", "drush:createdb"
   after "deploy:setup", "drush:init_settings"
   before "drush:updatedb", "drush:backupdb"
