@@ -16,9 +16,11 @@ Gem::Specification.new do |s|
     "README.markdown"
   ]
   s.files = [
-    "README.markdown",
+    ".gitignore",
+     "README.markdown",
      "Rakefile",
      "VERSION",
+     "capistrano-drupal.gemspec",
      "lib/capistrano-drupal.rb"
   ]
   s.homepage = %q{http://github.com/previousnext/capistrano-drupal/}
