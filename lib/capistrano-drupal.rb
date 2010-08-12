@@ -29,13 +29,14 @@ Capistrano::Configuration.instance(:must_exist).load do
     Capistrano::CLI.ui.ask("MySQL password:")
   }
 
-  after "deploy:symlink", "drupal:symlink_shared"
+  
   after "deploy:setup", "drush:createdb"
   after "deploy:setup", "drush:init_settings"
   before "drush:updatedb", "drush:backupdb"
-  after "deploy:update_code", "drush:updatedb"
-  after "deploy:finalize_update", "drush:cache_clear"
-  after "deploy:finalize_update", "git:push_deploy_tag"
+  after "deploy:symlink", "drupal:symlink_shared"
+  after "deploy:symlink", "drush:updatedb"
+  after "deploy:symlink", "drush:cache_clear"
+  after "deploy:symlink", "git:push_deploy_tag"
   after "deploy:cleanup", "git:cleanup_deploy_tag"
   
   namespace :deploy do
@@ -102,7 +103,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Backup the database"
     task :backupdb, :on_error => :continue do
       t = Time.now.utc.strftime("%Y-%m-%dT%H-%M-%S")
-      run "drush -r #{current_path}/pressflow sql-dump --result-file=/tmp/#{application}-#{t}.sql"
+      run "drush -r #{app_path} bam backup --allow-spaces-in-commands"
     end
 
     desc "Run Drupal database migrations if required"
