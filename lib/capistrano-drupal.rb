@@ -75,7 +75,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :push_deploy_tag do
       user = `git config --get user.name`
       email = `git config --get user.email`
-      tag = 'release_#{release_name}'
+      tag = "release_#{release_name}"
       puts `git tag #{tag} #{revision} -m "Deployed by #{user} <#{email}>"`
       puts `git push origin tag #{tag}`
     end
