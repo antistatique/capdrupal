@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kim Pepper"]
-  s.date = %q{2010-08-18}
+  s.date = %q{2010-08-31}
   s.description = %q{A set of tasks for deploying Drupal projects with Capistrano. Includes tasks for configuring apache and mysql}
   s.email = %q{kim@previousnext.com.au}
   s.extra_rdoc_files = [
