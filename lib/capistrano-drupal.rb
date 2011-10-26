@@ -15,7 +15,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :runner_group, "www-data"
   
   set(:deploy_to) { "/var/www/#{application}" }
-  set :shared_children, ['files']
+  set :shared_children, ['files', 'private']
   
   set(:db_root_password) {
     Capistrano::CLI.ui.ask("MySQL root password:")
@@ -55,7 +55,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :setup, :except => { :no_release => true } do
       dirs = [deploy_to, releases_path, shared_path]
       dirs += shared_children.map { |d| File.join(shared_path, d) }
-      run "#{try_sudo} mkdir -p #{dirs.join(' ')} && #{try_sudo} chown #{runner}:#{runner_group} #{dirs.join(' ')} && #{try_sudo} chmod g+w #{dirs.join(' ')}"
+      run "#{try_sudo} mkdir -p #{dirs.join(' ')}"
+      run "#{try_sudo} chown -R #{runner}:#{runner_group} #{dirs.join(' ')}"
+      run "#{try_sudo} chmod -R g+w #{dirs.join(' ')}"
     end
   end
   
@@ -63,7 +65,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Symlink settings and files to shared directory. This allows the settings.php and \
       and sites/default/files directory to be correctly linked to the shared directory on a new deployment."
     task :symlink_shared do
-      ["files", "settings.php"].each do |asset|
+      ["files", "private", "settings.php"].each do |asset|
         run "rm -rf #{app_path}/#{asset} && ln -nfs #{shared_path}/#{asset} #{app_path}/sites/default/#{asset}"
       end
     end
