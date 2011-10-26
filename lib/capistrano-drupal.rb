@@ -78,34 +78,21 @@ Capistrano::Configuration.instance(:must_exist).load do
       user = `git config --get user.name`
       email = `git config --get user.email`
       tag = "release_#{release_name}"
+      if exists?(:stage)
+        tag = "#{stage}_#{tag}"
+      end
       puts `git tag #{tag} #{revision} -m "Deployed by #{user} <#{email}>"`
       puts `git push origin tag #{tag}`
     end
 
-    desc "Place release tag into Git and push it to server."
-    task :cleanup_deploy_tag do
-      count = fetch(:keep_releases, 5).to_i
-      if count >= releases.length
-        logger.important "no old release tags to clean up"
-      else
-        logger.info "keeping #{count} of #{releases.length} release tags"
-
-        tags = (releases - releases.last(count)).map { |release| "release_#{release}" }
-
-        tags.each do |tag|
-          `git tag -d #{tag}`
-          `git push origin :refs/tags/#{tag}`
-        end
-      end
-    end
-  end
+   end
   
   namespace :drush do
 
     desc "Backup the database"
     task :backupdb, :on_error => :continue do
       t = Time.now.utc.strftime("%Y-%m-%dT%H-%M-%S")
-      run "drush -r #{app_path} bam backup --allow-spaces-in-commands"
+      run "drush -r #{app_path} bam-backup"
     end
 
     desc "Run Drupal database migrations if required"
@@ -116,18 +103,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
       run "drush -r #{app_path}  cc all"
-    end
-
-    desc "Create the database"
-    task :createdb, :on_error => :continue do
-      run "mysqladmin -uroot -p#{db_root_password} create #{app_name}"
-      run "mysql -uroot -p#{db_root_password} #{app_name} -e \"grant all on #{app_name}.* to '#{db_username}'@'localhost' identified by '#{db_password}'\""    
-    end
-
-    desc "Initialise settings.php"
-    task :init_settings do
-      upload "pressflow/sites/default/default.settings.php", "#{shared_path}/settings.php"
-      run "chmod 664 #{shared_path}/settings.php"
     end
 
   end
