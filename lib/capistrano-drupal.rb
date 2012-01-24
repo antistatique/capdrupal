@@ -17,19 +17,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   set(:deploy_to) { "/var/www/#{application}" }
   set :shared_children, ['files', 'private']
   
-  set(:db_root_password) {
-    Capistrano::CLI.ui.ask("MySQL root password:")
-  }
-  
-  set(:db_username) {
-    Capistrano::CLI.ui.ask("MySQL username:")
-  }
-  
-  set(:db_password) {
-    Capistrano::CLI.ui.ask("MySQL password:")
-  }
-
-  
   after "deploy:setup", "drush:createdb"
   after "deploy:setup", "drush:init_settings"
   before "drush:updatedb", "drush:backupdb"
