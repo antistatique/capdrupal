@@ -20,9 +20,11 @@ Capistrano::Configuration.instance(:must_exist).load do
   after "deploy:setup", "drush:createdb"
   after "deploy:setup", "drush:init_settings"
   before "drush:updatedb", "drush:backupdb"
+  after "drupal:symlink_shared", "drush:site_offline"
   after "deploy:symlink", "drupal:symlink_shared"
   after "deploy:symlink", "drush:updatedb"
   after "deploy:symlink", "drush:cache_clear"
+  after "deploy:symlink", "drush:site_online"
   after "deploy:symlink", "git:push_deploy_tag"
   
   namespace :deploy do
@@ -89,6 +91,16 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
       run "drush -r #{app_path}  cc all"
+    end
+    
+    desc "Set the site offline"
+    task :site_offline do
+      run "drush -r #{app_path} vset site_offline 1 -y"
+    end
+
+    desc "Set the site online"
+    task :site_online do
+      run "drush -r #{app_path} vset site_offline 0 -y"
     end
 
   end
