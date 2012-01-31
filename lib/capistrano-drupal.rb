@@ -94,12 +94,12 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
     
     desc "Set the site offline"
-    task :site_offline do
+    task :site_offline, :on_error => :continue do
       run "drush -r #{app_path} vset site_offline 1 -y"
     end
 
     desc "Set the site online"
-    task :site_online do
+    task :site_online, :on_error => :continue do
       run "drush -r #{app_path} vset site_offline 0 -y"
     end
 
