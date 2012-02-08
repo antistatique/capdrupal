@@ -14,7 +14,7 @@ Open your application's `Capfile` and make it begin like this:
 
     require 'rubygems'
     require 'railsless-deploy'
-    require 'capistrano-drupal
+    require 'capistrano-drupal'
     load    'config/deploy'
 
 You should then be able to proceed as you would usually, you may want to familiarise yourself with the truncated list of tasks, you can get a full list with:
