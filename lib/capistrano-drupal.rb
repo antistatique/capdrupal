@@ -19,7 +19,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   after "deploy:setup", "drush:createdb"
   after "deploy:setup", "drush:init_settings"
-  before "drush:updatedb", "drush:backupdb"
   after "drupal:symlink_shared", "drush:site_offline"
   after "deploy:symlink", "drupal:symlink_shared"
   after "deploy:symlink", "drush:updatedb"
