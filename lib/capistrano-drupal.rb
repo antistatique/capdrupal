@@ -41,10 +41,10 @@ Capistrano::Configuration.instance(:must_exist).load do
     DESC
     task :setup, :except => { :no_release => true } do
       dirs = [deploy_to, releases_path, shared_path]
-      dirs += shared_children.map { |d| File.join(shared_path, d) }
       run "#{try_sudo} mkdir -p #{dirs.join(' ')}"
       run "#{try_sudo} chown -R #{runner}:#{runner_group} #{dirs.join(' ')}"
-      run "#{try_sudo} chmod -R g+w #{dirs.join(' ')}"
+      sub_dirs = shared_children.map { |d| File.join(shared_path, d) }
+      run "#{try_sudo} chmod -R g+w #{sub_dirs.join(' ')}"
     end
   end
   
