@@ -13,6 +13,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset :branch, "master"
   set :git_enable_submodules, true
   set :runner_group, "www-data"
+  set :group_writable, false
   
   set(:deploy_to) { "/var/www/#{application}" }
   set :shared_children, ['files', 'private']
