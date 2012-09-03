@@ -17,10 +17,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   set(:deploy_to) { "/var/www/#{application}" }
   set :shared_children, ['files', 'private']
-  
-  after "deploy:setup", "drush:createdb"
-  after "deploy:setup", "drush:init_settings"
-  
+    
   after "deploy:update_code", "drupal:symlink_shared", "drush:site_offline", "drush:updatedb", "drush:cache_clear", "drush:site_online"
   after "deploy", "git:push_deploy_tag"
   
