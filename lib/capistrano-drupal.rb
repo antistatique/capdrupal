@@ -87,7 +87,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
-      run "#{drush_cmd} -r #{app_path}  cc all"
+      run "#{drush_cmd} -r #{app_path} cc all"
     end
     
     desc "Set the site offline"
