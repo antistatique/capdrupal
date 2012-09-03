@@ -23,5 +23,7 @@ You should then be able to proceed as you would usually, you may want to familia
 
 ## Roadmap
 
-- Run drush make on deploy
-- Run composer install on deploy
+- Split out the tasks into indivual files/modules
+- Use drush aliases
+- Support install profiles
+- Support composer
