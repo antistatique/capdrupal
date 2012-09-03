@@ -12,6 +12,9 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :deploy_via, :remote_cache
   _cset :branch, "master"
   set :git_enable_submodules, true
+  
+  set :drush_cmd, "drush"
+  
   set :runner_group, "www-data"
   set :group_writable, false
   
@@ -74,29 +77,29 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Backup the database"
     task :backupdb, :on_error => :continue do
       t = Time.now.utc.strftime("%Y-%m-%dT%H-%M-%S")
-      run "drush -r #{app_path} bam-backup"
+      run "#{drush_cmd} -r #{app_path} bam-backup"
     end
 
     desc "Run Drupal database migrations if required"
     task :updatedb, :on_error => :continue do
-      run "drush -r #{app_path} updatedb -y"
+      run "#{drush_cmd} -r #{app_path} updatedb -y"
     end
 
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
-      run "drush -r #{app_path}  cc all"
+      run "#{drush_cmd} -r #{app_path}  cc all"
     end
     
     desc "Set the site offline"
     task :site_offline, :on_error => :continue do
-      run "drush -r #{app_path} vset site_offline 1 -y"
-      run "drush -r #{app_path} vset maintenance_mode 1 -y"
+      run "#{drush_cmd} -r #{app_path} vset site_offline 1 -y"
+      run "#{drush_cmd} -r #{app_path} vset maintenance_mode 1 -y"
     end
 
     desc "Set the site online"
     task :site_online, :on_error => :continue do
-      run "drush -r #{app_path} vset site_offline 0 -y"
-      run "drush -r #{app_path} vset maintenance_mode 0 -y"
+      run "#{drush_cmd} -r #{app_path} vset site_offline 0 -y"
+      run "#{drush_cmd} -r #{app_path} vset maintenance_mode 0 -y"
     end
 
   end
