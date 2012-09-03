@@ -76,7 +76,6 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Backup the database"
     task :backupdb, :on_error => :continue do
-      t = Time.now.utc.strftime("%Y-%m-%dT%H-%M-%S")
       run "#{drush_cmd} -r #{app_path} bam-backup"
     end
 
