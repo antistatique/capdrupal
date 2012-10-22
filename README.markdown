@@ -5,7 +5,21 @@ This gem provides a number of tasks which are useful for deploying Drupal projec
 Credit goes to railsless-deploy for many ideas here.
 
 ## Installation
+These gems must be installed on your system first.
 
+* capistrano
+* rubygems
+* railsless-deploy
+
+You can check to see a list of installed gems by running this.
+
+    $ gem query --local
+
+If any of these gems is missing you can install them with:
+
+    $ gem install gemname
+
+Finally install the capistrano-drupal recipes as a gem.
     # gem install capistrano-drupal
     
 ## Usage
