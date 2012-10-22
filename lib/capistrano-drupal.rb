@@ -19,6 +19,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :group_writable, false
   
   set(:deploy_to) { "/var/www/#{application}" }
+  set(:app_path) { "#{deploy_to}/current" }
   set :shared_children, ['files', 'private']
     
   after "deploy:update_code", "drupal:symlink_shared", "drush:site_offline", "drush:updatedb", "drush:cache_clear", "drush:site_online"
