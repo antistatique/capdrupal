@@ -8,22 +8,24 @@ Capistrano::Configuration.instance(:must_exist).load do
   # are not sufficient.
   # =========================================================================
 
-  set :scm, :git
-  set :deploy_via, :remote_cache
+  _cset :scm, :git
+  _cset :deploy_via, :remote_cache
   _cset :branch, "master"
-  set :git_enable_submodules, true
+  _cset :git_enable_submodules, true
   
-  set :drush_cmd, "drush"
+  _cset :drush_cmd, "drush"
   
-  set :runner_group, "www-data"
-  set :group_writable, false
+  _cset :runner_group, "www-data"
+  _cset :group_writable, false
   
-  set(:deploy_to) { "/var/www/#{application}" }
-  set(:app_path) { "#{deploy_to}/current" }
-  set :shared_children, ['files', 'private']
-    
+  _cset(:deploy_to) { "/var/www/#{application}" }
+  _cset(:app_path) { "#{deploy_to}/current" }
+  _cset :shared_children, ['files', 'private']
+  
   after "deploy:update_code", "drupal:symlink_shared", "drush:site_offline", "drush:updatedb", "drush:cache_clear", "drush:site_online"
-  after "deploy", "git:push_deploy_tag"
+
+  # This is an optional step that can be defined.
+  #after "deploy", "git:push_deploy_tag"
   
   namespace :deploy do
     desc <<-DESC
