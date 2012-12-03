@@ -19,10 +19,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset :group_writable, false
   
   _cset(:deploy_to) { "/var/www/#{application}" }
-  _cset(:app_path) { "#{deploy_to}/current" }
-  _cset :shared_children, ['files', 'private']
+  _cset(:app_path) { "drupal" }
+  _cset :shared_children, false
   
-  after "deploy:update_code", "drupal:symlink_shared", "drush:site_offline", "drush:updatedb", "drush:cache_clear", "drush:site_online"
+  after "deploy:update_code", "drupal:symlink_shared", "drush:site_offline", "drush:updatedb", "drush:cache_clear", "drush:feature_revert", "drush:site_online"
 
   # This is an optional step that can be defined.
   #after "deploy", "git:push_deploy_tag"
@@ -53,11 +53,25 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   namespace :drupal do
-    desc "Symlink settings and files to shared directory. This allows the settings.php and \
-      and sites/default/files directory to be correctly linked to the shared directory on a new deployment."
-    task :symlink_shared do
-      ["files", "private", "settings.php"].each do |asset|
-        run "rm -rf #{app_path}/#{asset} && ln -nfs #{shared_path}/#{asset} #{app_path}/sites/default/#{asset}"
+    desc "Symlinks static directories and static files that need to remain between deployments"
+    task :symlink_shared, :roles => :app, :except => { :no_release => true } do
+      if shared_children
+        # Creating symlinks for shared directories
+        shared_children.each do |link|
+          run "#{try_sudo} mkdir -p #{shared_path}/#{link}"
+          run "#{try_sudo} sh -c 'if [ -d #{release_path}/#{link} ] ; then rm -rf #{release_path}/#{link}; fi'"
+          run "#{try_sudo} ln -nfs #{shared_path}/#{link} #{release_path}/#{link}"
+        end
+      end
+
+      if shared_files
+        # Creating symlinks for shared files
+        shared_files.each do |link|
+          link_dir = File.dirname("#{shared_path}/#{link}")
+          run "#{try_sudo} mkdir -p #{link_dir}"
+          run "#{try_sudo} touch #{shared_path}/#{link}"
+          run "#{try_sudo} ln -nfs #{shared_path}/#{link} #{release_path}/#{link}"
+        end
       end
     end
   end
@@ -80,31 +94,36 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   namespace :drush do
 
+    desc "Set the site offline"
+    task :site_offline, :on_error => :continue do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 1 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 1 -y"
+    end
+
     desc "Backup the database"
     task :backupdb, :on_error => :continue do
-      run "#{drush_cmd} -r #{app_path} bam-backup"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} bam-backup"
     end
 
     desc "Run Drupal database migrations if required"
     task :updatedb, :on_error => :continue do
-      run "#{drush_cmd} -r #{app_path} updatedb -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} updatedb -y"
     end
 
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
-      run "#{drush_cmd} -r #{app_path} cc all"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} cc all"
     end
-    
-    desc "Set the site offline"
-    task :site_offline, :on_error => :continue do
-      run "#{drush_cmd} -r #{app_path} vset site_offline 1 -y"
-      run "#{drush_cmd} -r #{app_path} vset maintenance_mode 1 -y"
+
+    desc "Revert feature"
+    task :feature_revert, :on_error => :continue do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} fr all"
     end
 
     desc "Set the site online"
     task :site_online, :on_error => :continue do
-      run "#{drush_cmd} -r #{app_path} vset site_offline 0 -y"
-      run "#{drush_cmd} -r #{app_path} vset maintenance_mode 0 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 0 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 0 -y"
     end
 
   end
