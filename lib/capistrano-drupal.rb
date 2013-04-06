@@ -94,6 +94,12 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   namespace :drush do
 
+    desc "Gets drush and installs it"
+    task :get, :roles => :app, :except => { :no_release => true } do
+      run "#{try_sudo} cd #{shared_path} && curl -O -s http://ftp.drupal.org/files/projects/drush-7.x-5.8.tar.gz && tar -xf drush-7.x-5.8.tar.gz && rm drush-7.x-5.8.tar.gz"
+      run "#{try_sudo} cd #{shared_path} && chmod u+x drush/drush"
+    end
+
     desc "Set the site offline"
     task :site_offline, :on_error => :continue do
       run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 1 -y"
