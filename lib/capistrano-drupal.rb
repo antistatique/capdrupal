@@ -12,9 +12,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset :deploy_via, :remote_cache
   _cset :branch, "master"
   _cset :git_enable_submodules, true
-  
+
+  _cset :download_drush, false
   _cset :drush_cmd, "drush"
-  
+
   _cset :runner_group, "www-data"
   _cset :group_writable, false
   
@@ -22,7 +23,18 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:app_path) { "drupal" }
   _cset :shared_children, false
   
-  after "deploy:update_code", "drupal:symlink_shared", "drush:site_offline", "drush:updatedb", "drush:cache_clear", "drush:feature_revert", "drush:site_online"
+  after "deploy:update_code", "drupal:symlink_shared"
+  after "deploy:finalize_update" do
+    if download_drush
+      drush.get
+    end
+
+    drush.site_offline
+    drush.updatedb
+    drush.cache_clear
+    drush.feature_revert
+    drush.site_online
+  end
 
   # This is an optional step that can be defined.
   #after "deploy", "git:push_deploy_tag"
