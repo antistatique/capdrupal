@@ -20,8 +20,18 @@ If any of these gems is missing you can install them with:
     $ gem install gemname
 
 Finally install the capistrano-drupal recipes as a gem.
-    # gem install capistrano-drupal
-    
+
+### From RubyGems.org
+
+    $ gem install capistrano-drupal
+
+### From Github
+
+	$ git clone git://github.com/antistatique/capistrano-drupal.git
+	$ cd capistrano-drupal
+	$ gem build capistrano-drupal.gemspec
+	$ gem install capistrano-drupal-{version}.gem
+
 ## Usage
 
 Open your application's `Capfile` and make it begin like this:
