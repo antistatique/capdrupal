@@ -88,6 +88,25 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
   end
   
+  namespace :files do
+    desc "Pull drupal sites files (from remote to local)"
+    task :pull, :roles => :app, :except => { :no_release => true } do
+      remote_files_dir = "#{current_path}/#{app_path}/sites/default/files/"
+      local_files_dir = "#{app_path}/sites/default/files/"
+
+      run_locally("rsync --recursive --times --rsh=ssh --compress --human-readable --progress #{user}@#{domain}:#{remote_files_dir} #{local_files_dir}")
+    end
+
+    desc "Push drupal sites files (from local to remote)"
+    task :push, :roles => :app, :except => { :no_release => true } do
+      remote_files_dir = "#{current_path}/#{app_path}/sites/default/files/"
+      local_files_dir = "#{app_path}/sites/default/files/"
+
+      run_locally("rsync --recursive --times --rsh=ssh --compress --human-readable --progress #{local_files_dir} #{user}@#{domain}:#{remote_files_dir}")
+
+    end
+  end
+
   namespace :git do
 
     desc "Place release tag into Git and push it to origin server."
