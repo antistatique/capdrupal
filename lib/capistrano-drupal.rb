@@ -14,7 +14,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset :git_enable_submodules, true
 
   _cset :download_drush, false
-  _cset :drush_cmd, "drush"
+  _cset(:drush_cmd) { download_drush ? "#{shared_path}/drush/drush" : "drush" }
 
   _cset :runner_group, "www-data"
   _cset :group_writable, false
