@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
     "capdrupal.gemspec",
     "lib/capdrupal.rb"
   ]
-  s.require_paths = 'lib'
+  s.require_path = 'lib'
 
   s.add_dependency 'capistrano', ">= 2.13.5","<= 2.15.4"
   s.add_dependency 'railsless-deploy', "~> 1.1.2"
