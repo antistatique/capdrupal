@@ -2,7 +2,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   require 'capistrano/recipes/deploy/scm'
   require 'capistrano/recipes/deploy/strategy'
-  
+  require 'railsless-deploy'
+
   # =========================================================================
   # These variables may be set in the client capfile if their default values
   # are not sufficient.
