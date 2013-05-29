@@ -1,8 +1,8 @@
-# Capistrano Drupal
+# Capdrupal
 
-This gem provides a number of tasks which are useful for deploying Drupal projects. 
+This gem provides a number of tasks which are useful for deploying Drupal projects with capistrano. 
 
-Credit goes to railsless-deploy for many ideas here.
+Credit goes to https://github.com/previousnext/capistrano-drupal for many ideas here.
 
 ## Installation
 These gems must be installed on your system first.
@@ -23,14 +23,14 @@ Finally install the capistrano-drupal recipes as a gem.
 
 ### From RubyGems.org
 
-    $ gem install capistrano-drupal
+    $ gem install capdrupal
 
 ### From Github
 
-	$ git clone git://github.com/antistatique/capistrano-drupal.git
-	$ cd capistrano-drupal
-	$ gem build capistrano-drupal.gemspec
-	$ gem install capistrano-drupal-{version}.gem
+	$ git clone git://github.com/antistatique/capdrupal.git
+	$ cd capdrupal
+	$ gem build capdrupal.gemspec
+	$ gem install capdrupal-{version}.gem
 
 ## Usage
 
