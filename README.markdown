@@ -45,7 +45,7 @@ You should then be able to proceed as you would usually, you may want to familia
 
     $ cap -T
     
-This will show you the list of all options:
+This show a list of all avaible commands:
     
 	cap deploy                # Deploys your project.
 	cap deploy:check          # Test deployment dependencies.
