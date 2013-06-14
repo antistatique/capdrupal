@@ -36,7 +36,7 @@ Finally install the capistrano-drupal recipes as a gem or manually from Github.
 	
 ## Configuration
 
-It's highly recommended to use Git in your project, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easily just for one target. 
+It's highly recommended to use Git in your project, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easily use it just for one target. 
 
 First, go to your project directory and launch Capistrano.
 
@@ -85,7 +85,7 @@ Finally, set the other Capistrano related options, the number of realeases you w
 	set  :keep_releases,   5
 	after "deploy:update", "deploy:cleanup" 
 	
-Awesome, your configuration file is complete ! From now and whenever you want to add a new stage, create an new file in `config/deploy/` with in :
+Awesome, your configuration file is almost complete ! From now and whenever you want to add a new stage, create an new file in `config/deploy/` with in :
 
 	# Stage name (same as your filename, for example stage1.rb)
 	set :stages,    "stage1"
