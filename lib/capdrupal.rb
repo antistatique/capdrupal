@@ -152,12 +152,12 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} cc all"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} cache-clear all"
     end
 
     desc "Revert feature"
     task :feature_revert, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} fr all"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all"
     end
 
     desc "Set the site online"
