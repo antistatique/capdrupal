@@ -24,12 +24,14 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:app_path) { "drupal" }
   _cset :shared_children, false
   
-  after "deploy:update_code", "drupal:symlink_shared"
   after "deploy:finalize_update" do
+ 
     if download_drush
       drush.get
     end
-
+    
+    drupal.symlink_shared
+    
     drush.site_offline
     drush.updatedb
     drush.cache_clear
