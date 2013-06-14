@@ -36,7 +36,7 @@ Finally install the capistrano-drupal recipes as a gem or manually from Github.
 	
 ## Configuration
 
-It's highly recommended to use Git in your project, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easyly just for one target. 
+It's highly recommended to use Git in your project, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easily just for one target. 
 
 First, go to your project directory and launch Capistrano.
 
