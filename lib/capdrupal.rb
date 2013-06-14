@@ -37,6 +37,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     drush.cache_clear
     drush.feature_revert
     drush.site_online
+    drush.cache_clear
   end
 
   # This is an optional step that can be defined.
