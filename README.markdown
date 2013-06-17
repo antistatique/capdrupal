@@ -4,25 +4,9 @@ This gem provides a number of tasks which are useful for deploying Drupal projec
 
 
 ## Installation
+[gems](http://rubygems.org) must be installed on your system first.
 
-### Vendors
-Your Ruby version must be highter than 1.3.0 and these [gems](http://rubygems.org) must be installed on your system first.
-
-* capistrano
-* railsless-deploy
-
-One by one
-
-	$ gem install capistrano
-	$ gem install railsless-deploy
-	
-If you don't know if it's already install, check the list of your installed gems.
-
-    $ gem query --local
-
-Finally install the capistrano-drupal recipes as a gem or manually from Github.
-
-### From RubyGems.org
+### From RubyGems.org 
 
     $ gem install capdrupal
 
@@ -46,8 +30,7 @@ First, go to your project directory and launch Capistrano.
 Capistrano create two files `capfile` and `config/deploy.rb`. Open `capfile` and set the depencies.
 
 	require 'rubygems'
-	require 'railsless-deploy'
-	require 'capistrano-drupal'
+	require 'capdrupal'
 	load    'config/deploy'
 	
 Then, go to `config/deploy.rb` to set the parameters of your project. First you have to define the general informations (generaly use by multiple server) and the different stage you have.
