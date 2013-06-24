@@ -6,7 +6,6 @@ Gem::Specification.new do |s|
   s.platform     = Gem::Platform::RUBY
   s.description  = <<-DESC
     A set of tasks for deploying Drupal projects with Capistrano and the help of Drush.
-    Based on the work at https://github.com/previousnext/capistrano-drupal}
   DESC
   s.summary      = 'A set of tasks for deploying Drupal projects with Capistrano'
 
