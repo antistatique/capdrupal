@@ -72,7 +72,7 @@ Finally, set the other Capistrano related options, the number of realeases you w
 	set  :keep_releases,   5
 	after "deploy:update", "deploy:cleanup" 
 	
-Awesome, your configuration file is complete !
+Awesome, your configuration file is complete ! You can also use Capdrupal for [multistage](https://github.com/capistrano/capistrano/wiki/2.x-Multistage-Extension).
 
 
 ## Usage
