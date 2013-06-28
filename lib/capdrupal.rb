@@ -158,7 +158,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Revert feature"
     task :feature_revert, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all -y"
     end
 
     desc "Set the site online"

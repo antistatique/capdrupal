@@ -1,27 +1,12 @@
 # Capdrupal
 
-This gem provides a number of tasks which are useful for deploying Drupal projects with capistrano. 
+This gem provides a number of tasks which are useful for deploying Drupal projects with [Capistrano](https://github.com/capistrano/capistrano). 
 
-Credit goes to https://github.com/previousnext/capistrano-drupal for many ideas here.
 
 ## Installation
-These gems must be installed on your system first.
+[gems](http://rubygems.org) must be installed on your system first.
 
-* capistrano
-* rubygems
-* railsless-deploy
-
-You can check to see a list of installed gems by running this.
-
-    $ gem query --local
-
-If any of these gems is missing you can install them with:
-
-    $ gem install gemname
-
-Finally install the capistrano-drupal recipes as a gem.
-
-### From RubyGems.org
+### From RubyGems.org 
 
     $ gem install capdrupal
 
@@ -32,14 +17,98 @@ Finally install the capistrano-drupal recipes as a gem.
 	$ gem build capdrupal.gemspec
 	$ gem install capdrupal-{version}.gem
 
+	
+## Configuration
+
+It's highly recommended to use Git in your project, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easily use it just for one target. 
+
+First, go to your project directory and launch Capistrano.
+
+	$ cd path/to/your/directory/
+	$ capify .
+	
+Capistrano create two files `capfile` and `config/deploy.rb`. Open `capfile` and set the depencies.
+
+	require 'rubygems'
+	require 'capdrupal'
+	load    'config/deploy'
+	
+Then, go to `config/deploy.rb` to set the parameters of your project. First you have to define the general informations (generaly use by multiple server) and the different stage you have.
+
+	# USER
+	set :user,            "name"
+	set :group,           "name"
+	set :runner_group,    "name"
+	
+	# APP
+	set :application,     "appName"
+	set :stages,          %w(stage1 stage2)
+
+The specific Drupal informations and if you have already or not [Drush](https://drupal.org/project/drush) installed on your server (if your not sure, keep it TRUE).
+
+	# DRUPAL
+	set :app_path,        "drupal"
+	set :shared_children, ['drupal/sites/default/files']
+	set :shared_files,    ['drupal/sites/default/settings.php'] 
+	set :download_drush,  true
+
+Then, all the informations related to your Git repository
+
+	set :scm,            "git"
+	set :repository,     "git@github.com:user/repo-name.git"
+	
+Finally, set the other Capistrano related options, the number of realeases you want and the cleanup at the end of the deployment.
+
+	set :use_sudo,       false
+	default_run_options[:pty] = true
+	ssh_options[:forward_agent] = true	
+	role :app,           domain
+	role :db,            domain
+	
+	set  :keep_releases,   5
+	after "deploy:update", "deploy:cleanup" 
+	
+Awesome, your configuration file is almost complete ! From now and whenever you want to add a new stage, create an new file in `config/deploy/` with in :
+
+	# Stage name (same as your filename, for example stage1.rb)
+	set :stages,    "stage1"
+
+	# The Git branch you want to use
+	set :branch,    "dev"
+	
+	# The domain and the path to your app directory
+	set :domain,    "staging.domain.com"
+	set :deploy_to, "/home/path/to/my/app/"
+
+	# And the user if it's not the same as define in deploy.rb
+	set :user,           "staging"
+	set :group,          "staging"
+	set :runner_group,   "staging"
+
 ## Usage
 
-Open your application's `Capfile` and make it begin like this:
+So, after configuration come action ! The first time, you have to run this command with the choosing stage.
 
-    require 'rubygems'
-    require 'railsless-deploy'
-    require 'capistrano-drupal'
-    load    'config/deploy'
+	$ cap stage1 deploy:setup
+	
+In fact, Capistrano create directories and symlink to the targeted server. The `shared` directory contains all shared files of your app who don't need to be change. `Releases` contains the different releases of your app with a number define in `deploy.rb` and finally `current` is the symlink who target the right release.
+
+	myApp
+	├── current -> /home/myApp/releases/20130527070530
+	├── releases
+	│   ├── 20130527065508
+	│   ├── 20130527065907
+	│   └── 20130527070530
+	└── shared
+
+Now, every time you want to deploy you app !
+
+	$ cap stage1 deploy
+	
+And if some troubles occur, juste launch the rollback command to return to the previous release.
+
+	$ cap deploy:rollback
+
 
 You should then be able to proceed as you would usually, you may want to familiarise yourself with the truncated list of tasks, you can get a full list with:
 
@@ -79,3 +148,9 @@ This show a list of all avaible commands:
 	cap prod                  # Set the target stage to `prod'.
 	cap shell                 # Begin an interactive Capistrano session.
 
+
+## Credits
+
+Inspired by [capistrano-drupal](https://github.com/previousnext/capistrano-drupal).
+
+Made by [Antistatique](http://www.antistatique.net) who's always looking for new talented developpers ! Just mail us on [hello@antistatique.net](mailto:hello@antistatique.net).
