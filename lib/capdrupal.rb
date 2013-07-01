@@ -24,6 +24,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:app_path) { "drupal" }
   _cset :shared_children, false
   
+  if download_drush
+    depend :remote, :command, "curl"
+  end
+
   after "deploy:finalize_update" do
  
     if download_drush
