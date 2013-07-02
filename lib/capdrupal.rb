@@ -24,6 +24,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:app_path) { "drupal" }
   _cset :shared_children, false
   
+  if download_drush
+    depend :remote, :command, "curl"
+  end
+
   after "deploy:finalize_update" do
  
     if download_drush
@@ -158,7 +162,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Revert feature"
     task :feature_revert, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all -y"
     end
 
     desc "Set the site online"
