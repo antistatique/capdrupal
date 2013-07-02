@@ -4,25 +4,9 @@ This gem provides a number of tasks which are useful for deploying Drupal projec
 
 
 ## Installation
+[gems](http://rubygems.org) must be installed on your system first.
 
-### Vendors
-Your Ruby version must be highter than 1.3.0 and these [gems](http://rubygems.org) must be installed on your system first.
-
-* capistrano
-* railsless-deploy
-
-One by one
-
-	$ gem install capistrano
-	$ gem install railsless-deploy
-	
-If you don't know if it's already install, check the list of your installed gems.
-
-    $ gem query --local
-
-Finally install the capistrano-drupal recipes as a gem or manually from Github.
-
-### From RubyGems.org
+### From RubyGems.org 
 
     $ gem install capdrupal
 
@@ -46,11 +30,10 @@ First, go to your project directory and launch Capistrano.
 Capistrano create two files `capfile` and `config/deploy.rb`. Open `capfile` and set the depencies.
 
 	require 'rubygems'
-	require 'railsless-deploy'
-	require 'capistrano-drupal'
+	require 'capdrupal'
 	load    'config/deploy'
 	
-Then, go to `config/deploy.rb` to set the parameters of your project. First you have to define the general informations (generaly use by multiple server) and the different stage you have.
+Then, go to `config/deploy.rb` to set the parameters of your project. First you have to define the general informations about the user, server and the app himself.
 
 	# USER
 	set :user,            "name"
@@ -59,7 +42,10 @@ Then, go to `config/deploy.rb` to set the parameters of your project. First you 
 	
 	# APP
 	set :application,     "appName"
-	set :stages,          %w(stage1 stage2)
+	
+	# The domain and the path to your app directory
+	set :domain,    "staging.domain.com"
+	set :deploy_to, "/home/path/to/my/app/"
 
 The specific Drupal informations and if you have already or not [Drush](https://drupal.org/project/drush) installed on your server (if your not sure, keep it TRUE).
 
@@ -73,6 +59,7 @@ Then, all the informations related to your Git repository
 
 	set :scm,            "git"
 	set :repository,     "git@github.com:user/repo-name.git"
+	set :branch,         "dev"
 	
 Finally, set the other Capistrano related options, the number of realeases you want and the cleanup at the end of the deployment.
 
@@ -85,28 +72,14 @@ Finally, set the other Capistrano related options, the number of realeases you w
 	set  :keep_releases,   5
 	after "deploy:update", "deploy:cleanup" 
 	
-Awesome, your configuration file is almost complete ! From now and whenever you want to add a new stage, create an new file in `config/deploy/` with in :
+Awesome, your configuration file is complete ! You can also use Capdrupal for [multistage](https://github.com/capistrano/capistrano/wiki/2.x-Multistage-Extension).
 
-	# Stage name (same as your filename, for example stage1.rb)
-	set :stages,    "stage1"
-
-	# The Git branch you want to use
-	set :branch,    "dev"
-	
-	# The domain and the path to your app directory
-	set :domain,    "staging.domain.com"
-	set :deploy_to, "/home/path/to/my/app/"
-
-	# And the user if it's not the same as define in deploy.rb
-	set :user,           "staging"
-	set :group,          "staging"
-	set :runner_group,   "staging"
 
 ## Usage
 
 So, after configuration come action ! The first time, you have to run this command with the choosing stage.
 
-	$ cap stage1 deploy:setup
+	$ cap deploy:setup
 	
 In fact, Capistrano create directories and symlink to the targeted server. The `shared` directory contains all shared files of your app who don't need to be change. `Releases` contains the different releases of your app with a number define in `deploy.rb` and finally `current` is the symlink who target the right release.
 
@@ -120,7 +93,7 @@ In fact, Capistrano create directories and symlink to the targeted server. The `
 
 Now, every time you want to deploy you app !
 
-	$ cap stage1 deploy
+	$ cap deploy
 	
 And if some troubles occur, juste launch the rollback command to return to the previous release.
 
@@ -132,6 +105,7 @@ You should then be able to proceed as you would usually, you may want to familia
     $ cap -T
     
 This show a list of all avaible commands:
+
     
 	cap deploy                # Deploys your project.
 	cap deploy:check          # Test deployment dependencies.
@@ -169,4 +143,4 @@ This show a list of all avaible commands:
 
 Inspired by [capistrano-drupal](https://github.com/previousnext/capistrano-drupal).
 
-Made by [Antistatique](http://www.antistatique.net) who's always looking for new talented developpers ! Just mail us on [hello@antistatique.net](mailto:hello@antistatique.net).
+Made by [Antistatique](http://www.antistatique.net) who's always looking for new talented developpers ! Just mail us on [job@antistatique.net](mailto:hello@antistatique.net).
