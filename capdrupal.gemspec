@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name         = 'capdrupal'
-  s.version      = '0.9.4'
+  s.version      = '0.9.5'
   s.platform     = Gem::Platform::RUBY
   s.description  = <<-DESC
     A set of tasks for deploying Drupal projects with Capistrano and the help of Drush.
