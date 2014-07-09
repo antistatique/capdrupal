@@ -16,6 +16,28 @@ This gem provides a number of tasks which are useful for deploying Drupal projec
 	$ cd capdrupal
 	$ gem build capdrupal.gemspec
 	$ gem install capdrupal-{version}.gem
+	
+### Use Bundler to avoid conflict with Capistrano 3
+
+This version use capistrano 2. Installation with [bundler](http://bundler.io/) let you use both version and avoid conflict.
+
+Create a 'Gemfile' on the root of your project
+
+
+	group :development do
+	  gem 'capistrano', '~> 2.15.5'
+	  gem 'railsless-deploy'
+	  gem 'capdrupal'
+	  #other development gems...
+	end
+	
+Install the depencies
+
+	$ bundle install
+	
+Use capistrano throuw bundle
+
+	$ bundle exec cap deploy
 
 	
 ## Configuration
