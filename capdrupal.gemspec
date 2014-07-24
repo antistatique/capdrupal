@@ -1,30 +1,30 @@
-# -*- encoding: utf-8 -*-
+# coding: utf-8
 
-Gem::Specification.new do |s|
-  s.name         = 'capdrupal'
-  s.version      = '0.9.6'
-  s.license      = 'MIT'
-  s.platform     = Gem::Platform::RUBY
-  s.description  = <<-DESC
-    A set of tasks for deploying Drupal projects with Capistrano and the help of Drush.
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+Gem::Specification.new do |spec|
+  spec.name         = 'capdrupal'
+  spec.version      = '2.0.0'
+  spec.license      = 'MIT'
+  spec.authors  = [ "Simon Perdrisat", "Gilles Doge" ]
+  spec.email    = 'gilles.doge@gmail.com'
+  spec.homepage = %q{http://github.com/antistatique/capdrupal/}
+
+  spec.platform     = Gem::Platform::RUBY
+  spec.description  = <<-DESC
+    A set of tasks for deploying Drupal 8 projects with Capistrano 3 and the help of Drush.
   DESC
-  s.summary      = 'A set of tasks for deploying Drupal projects with Capistrano'
+  spec.summary      = 'A set of tasks for deploying Drupal 8 projects with Capistrano 3'
 
-  s.extra_rdoc_files = [
-    "README.markdown"
-  ]
-  s.files = [
-    "README.markdown",
-    "VERSION",
-    "capdrupal.gemspec",
-    "lib/capdrupal.rb"
-  ]
-  s.require_path = 'lib'
 
-  s.add_dependency 'capistrano', '~> 2.13', '>= 2.13.4'
-  s.add_dependency 'railsless-deploy', '~> 1.1', '>= 1.1.2'
+  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.files = `git ls-files`.split($/)
+  specrequire_paths = ['lib']
 
-  s.authors  = [ "Simon Perdrisat", "Gilles Doge", "Robert Wohleb", "Kim Pepper" ]
-  s.email    = 'gilles.doge@gmail.com'
-  s.homepage = %q{http://github.com/antistatique/capdrupal/}
+  spec.add_dependency 'capistrano', '~> 3.0', '>= 3.2.0'
+
+  spec.add_development_dependency 'bundler', '~> 1.3'
+  spec.add_development_dependency 'rake', '~> 10.1'
+
 end
