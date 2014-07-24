@@ -2,6 +2,14 @@
 
 This gem provides a number of tasks which are useful for deploying Drupal projects with [Capistrano](https://github.com/capistrano/capistrano). 
 
+# Capdrupal Version
+
+
+Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version 
+--------------------- | ------ | ------------------ | --------------
+0.x                   |  d7    |   2                |    7.x
+2.x                   | master |   3                |    8.x
+
 
 ## Installation
 [gems](http://rubygems.org) must be installed on your system first.
@@ -17,18 +25,15 @@ This gem provides a number of tasks which are useful for deploying Drupal projec
 	$ gem build capdrupal.gemspec
 	$ gem install capdrupal-{version}.gem
 	
-### Use Bundler to avoid conflict with Capistrano 3
+### Install with Bundler (recomanded)
 
-This version use capistrano 2. Installation with [bundler](http://bundler.io/) let you use both version and avoid conflict.
+This version use capistrano 3. Installation with [bundler](http://bundler.io/) let you use both version and avoid conflict.
 
 Create a 'Gemfile' on the root of your project
 
 
 	group :development do
-	  gem 'capistrano', '~> 2.15.5'
-	  gem 'railsless-deploy'
-	  gem 'capdrupal'
-	  #other development gems...
+	  gem 'capdrupal', '~> 2.0.0'
 	end
 	
 Install the depencies
@@ -69,32 +74,17 @@ Then, go to `config/deploy.rb` to set the parameters of your project. First you 
 	set :domain,    "staging.domain.com"
 	set :deploy_to, "/home/path/to/my/app/"
 
-The specific Drupal informations and if you have already or not [Drush](https://drupal.org/project/drush) installed on your server (if your not sure, keep it TRUE).
+Drupal shared path
 
 	# DRUPAL
-	set :app_path,        "drupal"
-	set :shared_children, ['drupal/sites/default/files']
-	set :shared_files,    ['drupal/sites/default/settings.php'] 
-	set :download_drush,  true
+	set :linked_files, %w{sites/default/settings.php}
+        # Default value for linked_dirs is []
+        set :linked_dirs, %w{sites/default/files}
 
 Then, all the informations related to your Git repository
 
-	set :scm,            "git"
-	set :repository,     "git@github.com:user/repo-name.git"
+	set :repo_url,     "git@github.com:user/repo-name.git"
 	set :branch,         "dev"
-	
-Finally, set the other Capistrano related options, the number of realeases you want and the cleanup at the end of the deployment.
-
-	set :use_sudo,       false
-	default_run_options[:pty] = true
-	ssh_options[:forward_agent] = true	
-	role :app,           domain
-	role :db,            domain
-	
-	set  :keep_releases,   5
-	after "deploy:update", "deploy:cleanup" 
-	
-Awesome, your configuration file is complete ! You can also use Capdrupal for [multistage](https://github.com/capistrano/capistrano/wiki/2.x-Multistage-Extension).
 
 
 ## Usage
@@ -129,36 +119,44 @@ You should then be able to proceed as you would usually, you may want to familia
 This show a list of all avaible commands:
 
     
-	cap deploy                # Deploys your project.
-	cap deploy:check          # Test deployment dependencies.
-	cap deploy:cleanup        # Clean up old releases.
-	cap deploy:cold           # Deploys and starts a `cold' application.
-	cap deploy:create_symlink # Updates the symlink to the most recently deployed version.
-	cap deploy:pending        # Displays the commits since your last deploy.
-	cap deploy:pending:diff   # Displays the `diff' since your last deploy.
-	cap deploy:rollback       # Rolls back to a previous version and restarts.
-	cap deploy:rollback:code  # Rolls back to the previously deployed version.
-	cap deploy:setup          # Prepares one or more servers for deployment.
-	cap deploy:symlink        # Deprecated.
-	cap deploy:update         # Copies your project and updates the symlink.
-	cap deploy:update_code    # Copies your project to the remote servers.
-	cap deploy:upload         # Copy files to the currently deployed version.
-	cap dev                   # Set the target stage to `dev'.
-	cap drupal:symlink_shared # Symlinks static directories and static files that need to remain between d...
-	cap drush:backupdb        # Backup the database
-	cap drush:cache_clear     # Clear the drupal cache
-	cap drush:feature_revert  # Revert feature
-	cap drush:get             # Gets drush and installs it
-	cap drush:site_offline    # Set the site offline
-	cap drush:site_online     # Set the site online
-	cap drush:updatedb        # Run Drupal database migrations if required
-	cap files:pull            # Pull drupal sites files (from remote to local)
-	cap files:push            # Push drupal sites files (from local to remote)
-	cap git:push_deploy_tag   # Place release tag into Git and push it to origin server.
-	cap invoke                # Invoke a single command on the remote servers.
-	cap multistage:prepare    # Stub out the staging config files.
-	cap prod                  # Set the target stage to `prod'.
-	cap shell                 # Begin an interactive Capistrano session.
+cap composer:install               # Install composer
+cap deploy                         # Deploy a new release
+cap deploy:check                   # Check required files and directories exist
+cap deploy:check:directories       # Check shared and release directories exist
+cap deploy:check:linked_dirs       # Check directories to be linked exist in shared
+cap deploy:check:linked_files      # Check files to be linked exist in shared
+cap deploy:check:make_linked_dirs  # Check directories of files to be linked exist in shared
+cap deploy:cleanup                 # Clean up old releases
+cap deploy:cleanup_rollback        # Remove and archive rolled-back release
+cap deploy:finished                # Finished
+cap deploy:finishing               # Finish the deployment, clean up server(s)
+cap deploy:finishing_rollback      # Finish the rollback, clean up server(s)
+cap deploy:log_revision            # Log details of the deploy
+cap deploy:published               # Published
+cap deploy:publishing              # Publish the release
+cap deploy:revert_release          # Revert to previous release timestamp
+cap deploy:reverted                # Reverted
+cap deploy:reverting               # Revert server(s) to previous release
+cap deploy:rollback                # Rollback to previous release
+cap deploy:set_current_revision    # Place a REVISION file with the current revision SHA in the current release path
+cap deploy:started                 # Started
+cap deploy:starting                # Start a deployment, make sure server(s) ready
+cap deploy:symlink:linked_dirs     # Symlink linked directories
+cap deploy:symlink:linked_files    # Symlink linked files
+cap deploy:symlink:release         # Symlink release to current
+cap deploy:symlink:shared          # Symlink files and directories from shared to release
+cap deploy:updated                 # Updated
+cap deploy:updating                # Update server(s) by setting up a new release
+cap drupal:cache:clear             # Clear all caches
+cap drupal:cli                     # Open an interactive shell on a Drupal site
+cap drupal:config:import           # List any pending database updates
+cap drupal:drush                   # Run any drush command
+cap drupal:logs                    # Show logs
+cap drupal:requirements            # Provides information about things that may be wrong in your Drupal installation, if any
+cap drupal:update:updatedb         # Apply any database updates required (as with running update.php)
+cap drupal:update:updatedb_status  # List any pending database updates / Show a report of available minor updates to Drupal core and contrib projects
+cap drush:install                  # Install Drush
+cap install                        # Install Capistrano, cap install STAGES=staging,production
 
 
 ## Credits
