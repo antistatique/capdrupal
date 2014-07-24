@@ -2,6 +2,14 @@
 
 This gem provides a number of tasks which are useful for deploying Drupal projects with [Capistrano](https://github.com/capistrano/capistrano). 
 
+# Capdrupal version
+
+
+Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version 
+--------------------- | ------ | ------------------ | --------------
+0.x                   |  d7    |   2                |    7.x
+2.x                   | master |   3                |    8.x
+
 
 ## Installation
 [gems](http://rubygems.org) must be installed on your system first.
