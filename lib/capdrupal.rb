@@ -19,23 +19,26 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   _cset :runner_group, "www-data"
   _cset :group_writable, false
-  
+
   _cset(:deploy_to) { "/var/www/#{application}" }
   _cset(:app_path) { "drupal" }
   _cset :shared_children, false
-  
+
+  _cset :backup_path, "backups"
+  _cset :remote_tmp_dir, "/tmp"
+
   if download_drush
     depend :remote, :command, "curl"
   end
 
   after "deploy:finalize_update" do
- 
+
     if download_drush
       drush.get
     end
-    
+
     drupal.symlink_shared
-    
+
     drush.site_offline
     drush.updatedb
     drush.cache_clear
@@ -46,7 +49,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   # This is an optional step that can be defined.
   #after "deploy", "git:push_deploy_tag"
-  
+
   namespace :deploy do
     desc <<-DESC
       Prepares one or more servers for deployment. Before you can use any \
@@ -71,7 +74,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
   end
-  
+
   namespace :drupal do
     desc "Symlinks static directories and static files that need to remain between deployments"
     task :symlink_shared, :roles => :app, :except => { :no_release => true } do
@@ -95,7 +98,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
   end
-  
+
   namespace :files do
     desc "Pull drupal sites files (from remote to local)"
     task :pull, :roles => :app, :except => { :no_release => true } do
@@ -130,7 +133,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
    end
-  
+
   namespace :drush do
 
     desc "Gets drush and installs it"
@@ -172,5 +175,55 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
   end
-  
+
+  # Inspired by Capifony project
+  namespace :database do
+    namespace :dump do
+      task :remote do
+        filename  = "#{application}_dump.#{Time.now.utc.strftime("%Y%m%d%H%M%S")}.sql.gz"
+        sqlfile = "#{remote_tmp_dir}/#{filename}"
+
+        run "#{drush_cmd} -r #{latest_release}/#{app_path} sql-dump | gzip -9 > #{sqlfile}"
+
+        FileUtils::mkdir_p("#{backup_path}")
+
+        download(sqlfile, "#{backup_path}/#{filename}")
+
+        begin
+          FileUtils.ln_sf(filename, "#{backup_path}/#{application}_dump.latest.sql.gz")
+        rescue Exception # fallback for file systems that don't support symlinks
+          FileUtils.cp_r("#{backup_path}/#{filename}", "#{backup_path}/#{application}_dump.latest.sql.gz")
+        end
+
+        run "rm #{sqlfile}"
+      end
+    end
+
+    namespace :copy do
+      desc "Copy remote database into your local database"
+      task :to_local do
+        gzfile  = "#{backup_path}/#{application}_dump.latest.sql.gz"
+        sqlfile = "#{backup_path}/#{application}_dump.sql"
+
+        database.dump.remote
+
+        # be sure the file not already exist before un-gziping it
+        if File.exist?(sqlfile)
+          FileUtils.rm(sqlfile)
+        end
+
+        puts sqlfile
+
+        f = File.new(sqlfile, "a+")
+        gz = Zlib::GzipReader.new(File.open(gzfile, "r"))
+        f << gz.read
+        f.close
+
+        run_locally "cd #{app_path} && drush sql-connect < ../#{sqlfile}"
+
+        FileUtils.rm(sqlfile)
+      end
+    end
+  end
+
 end
