@@ -197,6 +197,23 @@ Capistrano::Configuration.instance(:must_exist).load do
 
         run "rm #{sqlfile}"
       end
+
+      task :local do
+        filename  = "#{application}.local_dump.#{Time.now.utc.strftime("%Y%m%d%H%M%S")}.sql.gz"
+        sqlfile = "#{backup_path}/#{filename}"
+
+        FileUtils::mkdir_p("#{backup_path}")
+
+        run_locally "cd #{app_path} &&  drush sql-dump | gzip -9 > ../#{sqlfile}"
+
+        begin
+          FileUtils.ln_sf(sqlfile, "#{backup_path}/#{application}.local_dump.latest.sql.gz")
+        rescue Exception # fallback for file systems that don't support symlinks
+          FileUtils.cp_r(sqlfile, "#{backup_path}/#{application}.local_dump.latest.sql.gz")
+        end
+
+        sqlfile
+      end
     end
 
     namespace :copy do
@@ -212,8 +229,6 @@ Capistrano::Configuration.instance(:must_exist).load do
           FileUtils.rm(sqlfile)
         end
 
-        puts sqlfile
-
         f = File.new(sqlfile, "a+")
         gz = Zlib::GzipReader.new(File.open(gzfile, "r"))
         f << gz.read
@@ -223,7 +238,22 @@ Capistrano::Configuration.instance(:must_exist).load do
 
         FileUtils.rm(sqlfile)
       end
+
+      desc "Copy local database to the remote database"
+      task :to_remote do
+        filename = "#{application}.local_dump.#{Time.now.utc.strftime("%Y%m%d%H%M%S")}.sql.gz"
+
+        if Capistrano::CLI.ui.agree("Do you really want to replace remote database by your local one? (y/N)") then
+          gzfile = database.dump.local
+
+          upload(gzfile, "#{remote_tmp_dir}/#{filename}")
+
+          mysqlcommand = capture("#{drush_cmd} -r #{latest_release}/#{app_path} sql-connect")
+          run "zcat #{remote_tmp_dir}/#{filename} | #{mysqlcommand}"
+
+          run "rm #{remote_tmp_dir}/#{filename}"
+        end
+      end
     end
   end
-
 end
