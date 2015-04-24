@@ -121,9 +121,13 @@ In fact, Capistrano create directories and symlink to the targeted server. The `
 	│   └── 20130527070530
 	└── shared
 
-Now, every time you want to deploy you app !
+Now, every time you want to deploy your app !
 
 	$ cap deploy
+
+If you want to deploy your app and also revert features, clear cache
+
+	$ cap deploy:full
 	
 And if some troubles occur, juste launch the rollback command to return to the previous release.
 
@@ -144,7 +148,7 @@ This show a list of all avaible commands:
 	cap deploy:cleanup          # Clean up old releases.
 	cap deploy:cold             # Deploys and starts a `cold' application.
 	cap deploy:create_symlink   # Updates the symlink to the most recently deployed version.
-	cap deploy:full             # Full deploy with updatedb, feature revert, cache clear.
+	cap deploy:full             # Deploy your project and do an updatedb, feature revert, cache clear...
 	cap deploy:pending          # Displays the commits since your last deploy.
 	cap deploy:pending:diff     # Displays the `diff' since your last deploy.
 	cap deploy:rollback         # Rolls back to a previous version and restarts.
