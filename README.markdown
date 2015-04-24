@@ -14,18 +14,7 @@ Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 ## Installation
 [gems](http://rubygems.org) must be installed on your system first.
 
-### From RubyGems.org 
-
-    $ gem install capdrupal
-
-### From Github
-
-	$ git clone git://github.com/antistatique/capdrupal.git
-	$ cd capdrupal
-	$ gem build capdrupal.gemspec
-	$ gem install capdrupal-{version}.gem
-	
-### Use Bundler to avoid conflict with Capistrano 3
+### With Bundler (highly recommanded)
 
 This version use capistrano 2. Installation with [bundler](http://bundler.io/) let you use both version and avoid conflict.
 
@@ -43,14 +32,25 @@ Install the depencies
 
 	$ bundle install
 	
-Use capistrano throuw bundle
+Use capistrano throw bundle
 
 	$ bundle exec cap deploy
+
+### From RubyGems.org 
+
+    $ gem install capdrupal
+
+### From Github
+
+	$ git clone git://github.com/antistatique/capdrupal.git
+	$ cd capdrupal
+	$ gem build capdrupal.gemspec
+	$ gem install capdrupal-{version}.gem
 
 	
 ## Configuration
 
-It's highly recommended to use Git in your project, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easily use it just for one target. 
+This was tested with Git, but you can also use Subversion or your favorite versionning software. This tutorial his made for multistage deployment, but you can easily use it just for one target. 
 
 First, go to your project directory and launch Capistrano.
 
@@ -121,9 +121,13 @@ In fact, Capistrano create directories and symlink to the targeted server. The `
 	│   └── 20130527070530
 	└── shared
 
-Now, every time you want to deploy you app !
+Now, every time you want to deploy your app !
 
 	$ cap deploy
+
+If you want to deploy your app and also revert features, clear cache
+
+	$ cap deploy:full
 	
 And if some troubles occur, juste launch the rollback command to return to the previous release.
 
@@ -137,36 +141,40 @@ You should then be able to proceed as you would usually, you may want to familia
 This show a list of all avaible commands:
 
     
-	cap deploy                # Deploys your project.
-	cap deploy:check          # Test deployment dependencies.
-	cap deploy:cleanup        # Clean up old releases.
-	cap deploy:cold           # Deploys and starts a `cold' application.
-	cap deploy:create_symlink # Updates the symlink to the most recently deployed version.
-	cap deploy:pending        # Displays the commits since your last deploy.
-	cap deploy:pending:diff   # Displays the `diff' since your last deploy.
-	cap deploy:rollback       # Rolls back to a previous version and restarts.
-	cap deploy:rollback:code  # Rolls back to the previously deployed version.
-	cap deploy:setup          # Prepares one or more servers for deployment.
-	cap deploy:symlink        # Deprecated.
-	cap deploy:update         # Copies your project and updates the symlink.
-	cap deploy:update_code    # Copies your project to the remote servers.
-	cap deploy:upload         # Copy files to the currently deployed version.
-	cap dev                   # Set the target stage to `dev'.
-	cap drupal:symlink_shared # Symlinks static directories and static files that need to remain between d...
-	cap drush:backupdb        # Backup the database
-	cap drush:cache_clear     # Clear the drupal cache
-	cap drush:feature_revert  # Revert feature
-	cap drush:get             # Gets drush and installs it
-	cap drush:site_offline    # Set the site offline
-	cap drush:site_online     # Set the site online
-	cap drush:updatedb        # Run Drupal database migrations if required
-	cap files:pull            # Pull drupal sites files (from remote to local)
-	cap files:push            # Push drupal sites files (from local to remote)
-	cap git:push_deploy_tag   # Place release tag into Git and push it to origin server.
-	cap invoke                # Invoke a single command on the remote servers.
-	cap multistage:prepare    # Stub out the staging config files.
-	cap prod                  # Set the target stage to `prod'.
-	cap shell                 # Begin an interactive Capistrano session.
+	cap database:copy:to_local  # Copy remote database into your local database
+	cap database:copy:to_remote # Copy local database to the remote database
+	cap deploy                  # Deploys your project.
+	cap deploy:check            # Test deployment dependencies.
+	cap deploy:cleanup          # Clean up old releases.
+	cap deploy:cold             # Deploys and starts a `cold' application.
+	cap deploy:create_symlink   # Updates the symlink to the most recently deployed version.
+	cap deploy:full             # Deploy your project and do an updatedb, feature revert, cache clear...
+	cap deploy:pending          # Displays the commits since your last deploy.
+	cap deploy:pending:diff     # Displays the `diff' since your last deploy.
+	cap deploy:rollback         # Rolls back to a previous version and restarts.
+	cap deploy:rollback:code    # Rolls back to the previously deployed version.
+	cap deploy:setup            # Prepares one or more servers for deployment.
+	cap deploy:symlink          # Deprecated API.
+	cap deploy:update           # Copies your project and updates the symlink.
+	cap deploy:update_code      # Copies your project to the remote servers.
+	cap deploy:upload           # Copy files to the currently deployed version.
+	cap dev                     # Set the target stage to `dev'.
+	cap drupal:backupdb         # Backup the database using backup and migrate
+	cap drupal:cache_clear      # Clear All the cache
+	cap drupal:drush            # Run any drush command
+	cap drupal:feature_revert   # Revert feature
+	cap drupal:site_offline     # Set the site offline
+	cap drupal:site_online      # Set the site online
+	cap drupal:symlink_shared   # Symlinks static directories and static files that need to remain between deployments
+	cap drupal:updatedb         # Run Drupal database migrations if required
+	cap drush:get               # Gets drush and installs it
+	cap files:pull              # Pull drupal sites files (from remote to local)
+	cap files:push              # Push drupal sites files (from local to remote)
+	cap git:push_deploy_tag     # Place release tag into Git and push it to origin server.
+	cap invoke                  # Invoke a single command on the remote servers.
+	cap multistage:prepare      # Stub out the staging config files.
+	cap production              # Set the target stage to `production'.
+	cap shell                   # Begin an interactive Capistrano session.
 
 
 ## Credits

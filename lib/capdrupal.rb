@@ -31,24 +31,12 @@ Capistrano::Configuration.instance(:must_exist).load do
     depend :remote, :command, "curl"
   end
 
-  after "deploy:finalize_update" do
-
-    if download_drush
-      drush.get
-    end
-
-    drupal.symlink_shared
-
-    drush.site_offline
-    drush.updatedb
-    drush.cache_clear
-    drush.feature_revert
-    drush.site_online
-    drush.cache_clear
-  end
-
   # This is an optional step that can be defined.
   #after "deploy", "git:push_deploy_tag"
+
+  after "deploy:finalize_update" do
+    drupal.symlink_shared
+  end
 
   namespace :deploy do
     desc <<-DESC
@@ -73,7 +61,26 @@ Capistrano::Configuration.instance(:must_exist).load do
         run "#{try_sudo} chmod 2775 #{sub_dirs.join(' ')}"
       end
     end
+
+    desc <<-DESC
+      Deploy your project and do an updatedb, feature revert, cache clear...
+    DESC
+    task :full do
+      deploy
+
+      if download_drush
+        drush.get
+      end
+
+      drupal.site_offline
+      drupal.updatedb
+      drupal.cache_clear
+      drupal.feature_revert
+      drupal.site_online
+      drupal.cache_clear
+    end
   end
+
 
   namespace :drupal do
     desc "Symlinks static directories and static files that need to remain between deployments"
@@ -97,6 +104,44 @@ Capistrano::Configuration.instance(:must_exist).load do
         end
       end
     end
+
+    desc 'Run any drush command'
+    task :drush do
+      drush_command = Capistrano::CLI.ui.ask "Drush command you want to run (eg. 'cache-rebuild'). Type 'help' to have a list of avaible command."
+        run "#{drush_cmd} -r #{latest_release}/#{app_path} #{drush_command}"
+    end
+
+    desc "Set the site offline"
+    task :site_offline do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 1 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 1 -y"
+    end
+
+    desc "Backup the database using backup and migrate"
+    task :backupdb, :on_error => :continue do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} bam-backup"
+    end
+
+    desc "Run Drupal database migrations if required"
+    task :updatedb, :on_error => :continue do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} updatedb -y"
+    end
+
+    desc "Clear All the cache"
+    task :cache_clear do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} cache-clear all"
+    end
+
+    desc "Revert feature"
+    task :feature_revert do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all -y"
+    end
+
+    desc "Set the site online"
+    task :site_online do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 0 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 0 -y"
+    end
   end
 
   namespace :files do
@@ -110,11 +155,12 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Push drupal sites files (from local to remote)"
     task :push, :roles => :app, :except => { :no_release => true } do
-      remote_files_dir = "#{current_path}/#{app_path}/sites/default/files/"
-      local_files_dir = "#{app_path}/sites/default/files/"
+      if Capistrano::CLI.ui.agree("Do you really want to push your local files to the server? This can ovewrite files. (y/N)") then
+        remote_files_dir = "#{current_path}/#{app_path}/sites/default/files/"
+        local_files_dir = "#{app_path}/sites/default/files/"
 
-      run_locally("rsync --recursive --times --rsh=ssh --compress --human-readable --progress #{local_files_dir} #{user}@#{domain}:#{remote_files_dir}")
-
+        run_locally("rsync --recursive --times --rsh=ssh --compress --human-readable --progress #{local_files_dir} #{user}@#{domain}:#{remote_files_dir}")
+      end
     end
   end
 
@@ -135,43 +181,10 @@ Capistrano::Configuration.instance(:must_exist).load do
    end
 
   namespace :drush do
-
     desc "Gets drush and installs it"
     task :get, :roles => :app, :except => { :no_release => true } do
       run "#{try_sudo} cd #{shared_path} && curl -O -s http://ftp.drupal.org/files/projects/drush-7.x-5.8.tar.gz && tar -xf drush-7.x-5.8.tar.gz && rm drush-7.x-5.8.tar.gz"
       run "#{try_sudo} cd #{shared_path} && chmod u+x drush/drush"
-    end
-
-    desc "Set the site offline"
-    task :site_offline, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 1 -y"
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 1 -y"
-    end
-
-    desc "Backup the database"
-    task :backupdb, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} bam-backup"
-    end
-
-    desc "Run Drupal database migrations if required"
-    task :updatedb, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} updatedb -y"
-    end
-
-    desc "Clear the drupal cache"
-    task :cache_clear, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} cache-clear all"
-    end
-
-    desc "Revert feature"
-    task :feature_revert, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all -y"
-    end
-
-    desc "Set the site online"
-    task :site_online, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 0 -y"
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 0 -y"
     end
 
   end
