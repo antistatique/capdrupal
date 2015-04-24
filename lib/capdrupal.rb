@@ -157,11 +157,12 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Push drupal sites files (from local to remote)"
     task :push, :roles => :app, :except => { :no_release => true } do
-      remote_files_dir = "#{current_path}/#{app_path}/sites/default/files/"
-      local_files_dir = "#{app_path}/sites/default/files/"
+      if Capistrano::CLI.ui.agree("Do you really want to push your local files to the server? This can ovewrite files. (y/N)") then
+        remote_files_dir = "#{current_path}/#{app_path}/sites/default/files/"
+        local_files_dir = "#{app_path}/sites/default/files/"
 
-      run_locally("rsync --recursive --times --rsh=ssh --compress --human-readable --progress #{local_files_dir} #{user}@#{domain}:#{remote_files_dir}")
-
+        run_locally("rsync --recursive --times --rsh=ssh --compress --human-readable --progress #{local_files_dir} #{user}@#{domain}:#{remote_files_dir}")
+      end
     end
   end
 
