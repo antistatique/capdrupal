@@ -63,9 +63,8 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc <<-DESC
-      Full deploy with updatedb, feature revert, cache clear.
+      Deploy your project and do an updatedb, feature revert, cache clear...
     DESC
-
     task :full do
       deploy
 
@@ -81,7 +80,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       drupal.cache_clear
     end
   end
-
 
 
   namespace :drupal do
