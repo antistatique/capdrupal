@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name         = 'capdrupal'
-  s.version      = '0.9.7'
+  s.version      = '0.10.0'
   s.license      = 'MIT'
   s.platform     = Gem::Platform::RUBY
   s.description  = <<-DESC
