@@ -1,3 +1,6 @@
+**Capdrupal is deprecated in favor of https://github.com/capistrano/drupal-deploy**
+
+
 # Capdrupal
 
 This gem provides a number of tasks which are useful for deploying Drupal projects with [Capistrano](https://github.com/capistrano/capistrano). 
