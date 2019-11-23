@@ -137,26 +137,6 @@ namespace :drupal do
         end
       end
     end
-
-    desc 'Update database with migrations scripts (stop on fail)'
-    task :update do
-      on roles(:app) do
-        within release_path.join(fetch(:app_path)) do
-          execute :drush, 'updatedb -y'
-        end
-      end
-    end
-
-    namespace :update do
-      desc 'Update database with migrations scripts (continue on fail)'
-      task :silence do
-        on roles(:app) do
-          within release_path.join(fetch(:app_path)) do
-            execute :drush, 'updatedb -y', raise_on_non_zero_exit: false
-          end
-        end
-      end
-    end
   end
 
   namespace :cache do
@@ -165,6 +145,19 @@ namespace :drupal do
       on roles(:app) do
         within release_path.join(fetch(:app_path)) do
           execute :drush, 'cr'
+        end
+      end
+    end
+  end
+
+  namespace :module do
+    desc 'Disable module'
+    task :disable do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          for mod in fetch(:disable_modules)
+            execute :drush, "pmu '#{mod}' -y"
+          end
         end
       end
     end
@@ -192,13 +185,31 @@ namespace :drupal do
     end
   end
 
-  namespace :entity do
-    desc 'Apply pending entity schema updates'
-    task :update do
+  desc 'Update database with migrations scripts'
+  task :updatedb do
+    on roles(:app) do
+      within release_path.join(fetch(:app_path)) do
+        execute :drush, 'updatedb -y'
+      end
+    end
+  end
+
+  namespace :updatedb do
+    desc 'Update database with migrations scripts'
+    task :silence do
       on roles(:app) do
         within release_path.join(fetch(:app_path)) do
-          execute :drush, 'entup -y'
+          execute :drush, 'updatedb -y', raise_on_non_zero_exit: false
         end
+      end
+    end
+  end
+
+  desc 'Apply pending entity schema updates'
+  task :entup do
+    on roles(:app) do
+      within release_path.join(fetch(:app_path)) do
+        execute :drush, 'entup -y'
       end
     end
   end
@@ -243,43 +254,44 @@ namespace :drupal do
     end
 
     desc 'Initalize shared path permissions'
-    task :shared do
+    task :writable_shared do
       on roles(:app) do
         within shared_path do
-          execute :chmod, '-R', '775', './web/sites/default/files'
+          # "web/sites/default/files" is a shared dir and should be writable.
+          execute :chmod, '-R', '775', "#{fetch(:app_path)}/sites/default/files"
 
           # Remove execution for files, keep execution on folder.
-          execute 'find', './web/sites/default/files -type f -executable -exec chmod -x {} \;'
-          execute 'find', './web/sites/default/files -type d -exec chmod +xs {} \;'
+          execute 'find', "#{fetch(:app_path)}/sites/default/files", '-type f -executable -exec chmod -x {} \;'
+          execute 'find', "#{fetch(:app_path)}/sites/default/files", '-type d -exec chmod +sx {} \;'
         end
       end
     end
   end
-end
 
-namespace :files do
-  desc "Download drupal sites files (from remote to local)"
-  task :download do
-    run_locally do
+  namespace :files do
+    desc "Download drupal sites files (from remote to local)"
+    task :download do
+      run_locally do
+        on release_roles :app do |server|
+          ask(:answer, "Do you really want to download the files on the server to your local files? Nothings will be deleted but files can be ovewrite. (y/N)");
+          if fetch(:answer) == 'y' then
+            remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/default/files/"
+            local_files_dir = "#{(fetch(:app_path))}/sites/default/files/"
+            system("rsync --recursive --times --rsh=ssh --human-readable --progress --exclude='.*' --exclude='css' --exclude='js' #{server.user}@#{server.hostname}:#{remote_files_dir} #{local_files_dir}")
+          end
+        end
+      end
+    end
+
+    desc "Upload drupal sites files (from local to remote)"
+    task :upload do
       on release_roles :app do |server|
-        ask(:answer, "Do you really want to download the files on the server to your local files? Nothings will be deleted but files can be ovewrite. (y/N)");
+        ask(:answer, "Do you really want to upload your local files to the server? Nothings will be deleted but files can be ovewrite. (y/N)");
         if fetch(:answer) == 'y' then
           remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/default/files/"
           local_files_dir = "#{(fetch(:app_path))}/sites/default/files/"
-          system("rsync --recursive --times --rsh=ssh --human-readable --progress --exclude='.*' --exclude='css' --exclude='js' #{server.user}@#{server.hostname}:#{remote_files_dir} #{local_files_dir}")
+          system("rsync --recursive --times --rsh=ssh --human-readable --progress --exclude='.*' --exclude='css' --exclude='js' #{local_files_dir} #{server.user}@#{server.hostname}:#{remote_files_dir}")
         end
-      end
-    end
-  end
-
-  desc "Upload drupal sites files (from local to remote)"
-  task :upload do
-    on release_roles :app do |server|
-      ask(:answer, "Do you really want to upload your local files to the server? Nothings will be deleted but files can be ovewrite. (y/N)");
-      if fetch(:answer) == 'y' then
-        remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/default/files/"
-        local_files_dir = "#{(fetch(:app_path))}/sites/default/files/"
-        system("rsync --recursive --times --rsh=ssh --human-readable --progress --exclude='.*' --exclude='css' --exclude='js' #{local_files_dir} #{server.user}@#{server.hostname}:#{remote_files_dir}")
       end
     end
   end
