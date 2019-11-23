@@ -167,6 +167,17 @@ namespace :deploy do
       end
     end
   end
+
+  # Workaround to map composer and drush commands
+  # NOTE: Only if stage have different deploy_to
+  # See https://github.com/capistrano/composer/issues/22
+  before :starting, :map_commands do
+    on roles(:app) do |server|
+      SSHKit.config.command_map[:composer] = "#{shared_path.join("composer.phar")}"
+      SSHKit.config.command_map[:drush] = "#{shared_path.join("vendor/bin/drush")}"
+    end
+  end
+
 end
 ```
 
