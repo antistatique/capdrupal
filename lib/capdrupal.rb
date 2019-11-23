@@ -4,6 +4,8 @@ namespace :load do
     set :install_drush, true
     set :app_path, 'web'
     set :config_name, 'sync'
+    set :backup_path, 'backups'
+    set :keep_backups, 5
 
     default = YAML.load_file('./config/d8/sync/system.site.yml')
 
@@ -68,14 +70,91 @@ namespace :drupal do
     end
   end
 
-  desc "Backup drupal site database"
-  task :backup do
-    on roles(:app) do
-      within release_path.join(fetch(:app_path)) do
-        time = Time.now.strftime("%Y%m%d_%H%M%S")
-        backup_destination = "#{shared_path}/backups/#{fetch(:stage)}_#{time}.tar"
+  namespace :db do
+    desc "Revert the current release drupal site database backup"
+    task :rollback do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          backup = "#{shared_path}/#{fetch(:backup_path)}/#{fetch(:stage)}_#{release_timestamp}"
 
-        execute :drush, "archive-backup default --no-core --destination=#{backup_destination} --tar-options=\"--exclude=.git --exclude=sites/default/files\""
+          # Unzip the file for rollback.
+          execute "gunzip #{backup}.gz"
+
+          unless test "[ -f #{backup} ]"
+            warn "backup file #{backup} does not exist."
+            next ""
+          end
+
+          # Revert from backup.
+          execute :drush, "sql:cli < #{backup}"
+
+          # Delete the unziped backup.
+          execute :rm, "#{backup}"
+        end
+      end
+    end
+
+    desc "Backup drupal site database"
+    task :backup do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          backup_destination = "#{shared_path}/#{fetch(:backup_path)}/#{fetch(:stage)}_#{release_timestamp}"
+          execute :drush, "sql:dump --result-file=#{backup_destination} --gzip"
+        end
+      end
+    end
+
+    namespace :backup do
+      desc "Check required files and directories exist"
+      task :check do
+        on release_roles :all do
+          execute :mkdir, "-p", "#{shared_path}/#{fetch(:backup_path)}"
+        end
+      end
+
+      desc "Clean up old drupal site database backup"
+      task :cleanup do
+        on roles(:app) do
+          within release_path.join(fetch(:app_path)) do
+            backup_path = "#{shared_path}/#{fetch(:backup_path)}"
+            keep_backups = fetch(:keep_backups, 5)
+
+            # Fetch every file from the backup directory, oldest on top.
+            backups = capture(:ls, "-ltrx", backup_path).split
+            info "Keeping #{keep_backups} of #{backups.count} backup dump on #{backup_path}."
+
+            # If we found less file than the keep number finish the task here
+            next "" unless backups.count > keep_backups.to_i
+
+            # Calculate number of file to delete.
+            to_delete = backups.count - keep_backups.to_i
+
+            # Loop throught file to delete (oldest files on top).
+            backups[0, to_delete].map do |backup|
+              execute :rm, "#{backup_path}/#{backup}"
+            end
+          end
+        end
+      end
+    end
+
+    desc 'Update database with migrations scripts (stop on fail)'
+    task :update do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          execute :drush, 'updatedb -y'
+        end
+      end
+    end
+
+    namespace :update do
+      desc 'Update database with migrations scripts (continue on fail)'
+      task :silence do
+        on roles(:app) do
+          within release_path.join(fetch(:app_path)) do
+            execute :drush, 'updatedb -y', raise_on_non_zero_exit: false
+          end
+        end
       end
     end
   end
@@ -91,20 +170,35 @@ namespace :drupal do
     end
   end
 
-  desc 'Update database with migrations scripts'
-  task :updatedb do
-    on roles(:app) do
-      within release_path.join(fetch(:app_path)) do
-        execute :drush, 'updatedb -y'
+  namespace :maintenance do
+    desc "Set maintenance mode"
+    task :on do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          execute :drush, "state:set system.maintenance_mode 1 -y"
+          execute :drush, 'cr'
+        end
+      end
+    end
+
+    desc "Remove maintenance mode"
+    task :off do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          execute :drush, "state:set system.maintenance_mode 0 -y"
+          execute :drush, 'cr'
+        end
       end
     end
   end
 
-  desc 'Apply pending entity schema updates'
-  task :entup do
-    on roles(:app) do
-      within release_path.join(fetch(:app_path)) do
-        execute :drush, 'entup -y'
+  namespace :entity do
+    desc 'Apply pending entity schema updates'
+    task :update do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          execute :drush, 'entup -y'
+        end
       end
     end
   end
@@ -134,29 +228,30 @@ namespace :drupal do
     end
   end
 
-  desc 'Set recommended Drupal permissions'
-  task :set_permissions do
-    on roles(:app) do
-      within release_path.join(fetch(:app_path)) do
-        execute :chmod, '-R', '555', '.'
+  namespace :permissions do
+    desc 'Set recommended Drupal permissions'
+    task :recommended do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          execute :chmod, '-R', '555', '.'
 
-        # Remove execution for files, keep execution on folder.
-        execute 'find', './ -type f -executable -exec chmod -x {} \;'
-        execute 'find', './ -type d -exec chmod +x {} \;'
+          # Remove execution for files, keep execution on folder.
+          execute 'find', './ -type f -executable -exec chmod -x {} \;'
+          execute 'find', './ -type d -exec chmod +x {} \;'
+        end
       end
-      # "web/sites/default/files" is a shared dir and should have write permissions.
     end
-  end
 
-  desc 'Initalize shared path permissions'
-  task :set_shared_permissions do
-    on roles(:app) do
-      within shared_path do
-        execute :chmod, '-R', '775', './sites/default/files'
+    desc 'Initalize shared path permissions'
+    task :shared do
+      on roles(:app) do
+        within shared_path do
+          execute :chmod, '-R', '775', './web/sites/default/files'
 
-        # Remove execution for files, keep execution on folder.
-        execute 'find', './sites/default/files -type f -executable -exec chmod -x {} \;'
-        execute 'find', './sites/default/files -type d -exec chmod +sx {} \;'
+          # Remove execution for files, keep execution on folder.
+          execute 'find', './web/sites/default/files -type f -executable -exec chmod -x {} \;'
+          execute 'find', './web/sites/default/files -type d -exec chmod +xs {} \;'
+        end
       end
     end
   end
