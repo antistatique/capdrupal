@@ -7,14 +7,14 @@ This gem provides a number of tasks which are useful for deploying & managing Dr
 Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 --------------------- | ------ | ------------------ | --------------
 7.x                   | d7     | 2                  | 7.x
-8.x                   | d8     | 3.5                | 8.x
+8.x                   | d8     | 3.11               | 8.x
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'capdrupal'
+gem 'capdrupal', '~>8.0' 
 ```
 
 And then execute:
@@ -89,7 +89,7 @@ set :install_composer, true
 set :install_drush, true
 
 set :app_path, 'web'
-set :config_path, 'config/d8/sync'
+set :config_path, 'config/sync'
 
 # Setup the backup before/after failed strategy.
 set :backup_path, 'backups'
@@ -120,8 +120,9 @@ namespace :deploy do
   after "deploy:check:directories", "drupal:db:backup:check"
 
   # Backup the database before starting a deployment and rollback on fail.
-  before :starting, "drupal:db:backup"
-  before :failed, "drupal:db:rollback"
+  # before :starting, "drupal:db:backup"
+  # before :failed, "drupal:db:rollback"
+   # before :cleanup, "drupal:db:backup:cleanup"
 
   # Set the maintenance Mode on your Drupal online project when deploying.
   after :updated, "drupal:maintenance:on"
@@ -148,8 +149,6 @@ namespace :deploy do
   after :updated, "drupal:permissions:recommended"
   after :updated, "drupal:permissions:writable_shared"
 
-  # Cleanup old database backups
-  before :cleanup, "drupal:db:backup:cleanup"
 
   # Fix the release permissions (due to Drupal restrictive permissions)
   # before deletting old release.
@@ -171,7 +170,6 @@ end
 ```
 
 You may now can configure your `staging.rb` and `production.rb` strategy, has you will certainly deploy on different environment
-
 
 ```shell
 vi config/deploy/staging.rb
@@ -242,7 +240,7 @@ cap [staging|production] deploy
 And if some troubles occur, just launch the rollback command to return to the previous release.
 
 ```
-cap [staging|production] drupal:db:rollback
+cap [staging|production] deploy:rollback
 ```
 
 You should then be able to proceed as you would usually, you may want to familiarise yourself with the truncated list of tasks, you can get a full list with:
@@ -255,4 +253,4 @@ cap -T
 
 Inspired by [capistrano-drupal](https://github.com/previousnext/capistrano-drupal).
 
-Made by [Antistatique](http://www.antistatique.net) who's always looking for new talented developpers ! Just mail us on [job@antistatique.net](mailto:hello@antistatique.net).
+Made by [Antistatique](https://antistatique.net) who's always looking for new talented developers ! Just mail us on [job@antistatique.net](mailto:job@antistatique.net).
