@@ -1,10 +1,10 @@
 # Capdrupal
 
-This gem provides a number of tasks which are useful for deploying & managing Drupal projects with [Capistrano](https://github.com/capistrano/capistrano). 
+This gem provides a number of tasks which are useful for deploying & managing Drupal projects with [Capistrano](https://github.com/capistrano/capistrano).
 
 # Capdrupal version
 
-Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version 
+Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 --------------------- | ------ | ------------------ | --------------
 7.x                   | d7     | 2                  | 7.x
 8.x                   | d8     | 3.5                | 8.x
@@ -38,7 +38,7 @@ cd path/to/your/drupal/project/
 cap install
 ```
 
-Capistrano will create the following skeleton 
+Capistrano will create the following skeleton
 
 ```
 .
@@ -54,7 +54,7 @@ Capistrano will create the following skeleton
 
 ```
 
-create two files `Capfile` and `config/deploy.rb`. Open `Capfile` and set the depencies.
+Create two files `Capfile` and `config/deploy.rb`. Open `Capfile` and set the dependencies.
 
 ```ruby
 # Load DSL and set up stages.
@@ -89,7 +89,7 @@ set :install_composer, true
 set :install_drush, true
 
 set :app_path, 'web'
-set :config_name, 'sync'
+set :config_path, 'config/d8/sync'
 
 # Setup the backup before/after failed strategy.
 set :backup_path, 'backups'
@@ -134,20 +134,20 @@ namespace :deploy do
   # Remove the cache after the database update
   after :updated, "drupal:cache:clear"
   after :updated, "drupal:config:import"
-  
+
   # Update the database after configurations has been imported.
   after :updated, "drupal:updatedb"
 
   # Clear your Drupal 8 cache.
   after :updated, "drupal:cache:clear"
-  
+
   # Disable the maintence on the Drupal project.
   after :updated, "drupal:maintenance:off"
-  
+
   # Ensure permissions are properly set.
   after :updated, "drupal:permissions:recommended"
   after :updated, "drupal:permissions:writable_shared"
-  
+
   # Cleanup old database backups
   before :cleanup, "drupal:db:backup:cleanup"
 
@@ -167,17 +167,6 @@ namespace :deploy do
       end
     end
   end
-
-  # Workaround to map composer and drush commands
-  # NOTE: Only if stage have different deploy_to
-  # See https://github.com/capistrano/composer/issues/22
-  before :starting, :map_commands do
-    on roles(:app) do |server|
-      SSHKit.config.command_map[:composer] = "#{shared_path.join("composer.phar")}"
-      SSHKit.config.command_map[:drush] = "#{shared_path.join("vendor/bin/drush")}"
-    end
-  end
-
 end
 ```
 
@@ -194,6 +183,13 @@ set :deploy_to, '/home/example.org/www/staging.example.org'
 
 # set a branch for this release
 set :branch, 'dev'
+
+# Map composer and drush commands
+# NOTE: If stage have different deploy_to
+# you have to copy those line for each <stage_name>.rb
+# See https://github.com/capistrano/composer/issues/22
+SSHKit.config.command_map[:composer] = shared_path.join("composer.phar")
+SSHKit.config.command_map[:drush] = shared_path.join("vendor/bin/drush")
 ```
 
 ```shell
@@ -206,6 +202,13 @@ set :deploy_to, '/home/example.org/www/example.org'
 
 # set a branch for this release
 set :branch, 'master'
+
+# Map composer and drush commands
+# NOTE: If stage have different deploy_to
+# you have to copy those line for each <stage_name>.rb
+# See https://github.com/capistrano/composer/issues/22
+SSHKit.config.command_map[:composer] = shared_path.join("composer.phar")
+SSHKit.config.command_map[:drush] = shared_path.join("vendor/bin/drush")
 ```
 
 Awesome, your configuration is complete !

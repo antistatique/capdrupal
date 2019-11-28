@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Kevin Wenger', 'Yann Lugrin', 'Gilles Doges', 'Toni Fisler', 'Simon Perdrisat', 'Robert Wohleb', 'Kim Pepper']
   spec.email         = ['dev@antistatique.net']
 
-  s.description      = <<-DESC
+  spec.description   = <<-DESC
     A set of tasks for deploying Drupal projects with Capistrano and the help of Drush.
   DESC
-  s.summary          = 'A set of tasks for deploying and managing Drupal projects with Capistrano'
-  s.homepage         = %q{http://github.com/antistatique/capdrupal/}
+  spec.summary       = 'A set of tasks for deploying and managing Drupal projects with Capistrano'
+  spec.homepage      = %q{http://github.com/antistatique/capdrupal/}
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -27,8 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'capistrano', '~> 3.5.0'
   spec.add_dependency 'capistrano-composer', '~> 0.0.6'
-  spec.add_dependency 'slackistrano', '~> 3.1.1'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rake', '~> 10.0.0'
 end

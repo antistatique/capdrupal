@@ -3,17 +3,9 @@ namespace :load do
     set :install_composer, true
     set :install_drush, true
     set :app_path, 'web'
-    set :config_name, 'sync'
+    set :config_path, 'config/sync'
     set :backup_path, 'backups'
     set :keep_backups, 5
-
-    default = YAML.load_file('./config/d8/sync/system.site.yml')
-
-    ask(:drupal_uuid, default['uuid'])
-    ask(:drupal_site_name, default['name'])
-    ask(:drupal_admin_username, 'admin')
-    ask(:drupal_admin_passowrd, 'admin', echo: false)
-    ask(:drupal_admin_email, default['mail'])
   end
 end
 
@@ -32,6 +24,13 @@ namespace :drupal do
 
   desc 'Bootstrap Drupal site with drush site-install command'
   task :bootstrap do
+    default = YAML.load_file("#{fetch(:config_path)}/system.site.yml")
+
+    ask(:drupal_uuid, default['uuid'])
+    ask(:drupal_site_name, default['name'])
+    ask(:drupal_admin_username, 'admin')
+    ask(:drupal_admin_passowrd, 'admin', echo: false)
+    ask(:drupal_admin_email, default['mail'])
     ask(:site_name, "Site name")
 
     warn <<-EOF
@@ -219,9 +218,9 @@ namespace :drupal do
     task :import do
       on roles(:app) do
         try = 0
-        config_path = release_path.join('config').join('d8').join(fetch(:config_name))
+        full_config_path = release_path.join(fetch(:config_path))
         within release_path.join(fetch(:app_path)) do
-          execute :drush, "config-import -y --source=#{config_path}"
+          execute :drush, "config-import -y --source=#{full_config_path}"
         rescue
           try += 1
           try < 5 ? retry : raise
