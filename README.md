@@ -14,7 +14,7 @@ Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'capdrupal', '~>8.0' 
+gem 'capdrupal', '~>8.0'
 ```
 
 And then execute:
@@ -122,7 +122,7 @@ namespace :deploy do
   # Backup the database before starting a deployment and rollback on fail.
   # before :starting, "drupal:db:backup"
   # before :failed, "drupal:db:rollback"
-   # before :cleanup, "drupal:db:backup:cleanup"
+  # before :cleanup, "drupal:db:backup:cleanup"
 
   # Set the maintenance Mode on your Drupal online project when deploying.
   after :updated, "drupal:maintenance:on"
