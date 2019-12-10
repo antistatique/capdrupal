@@ -6,6 +6,8 @@ namespace :load do
     set :config_path, 'config/sync'
     set :backup_path, 'backups'
     set :keep_backups, 5
+    set :enable_modules, []
+    set :disable_modules, []
   end
 end
 
@@ -150,7 +152,18 @@ namespace :drupal do
   end
 
   namespace :module do
-    desc 'Disable module'
+    desc 'Enable module(s)'
+    task :enable do
+      on roles(:app) do
+        within release_path.join(fetch(:app_path)) do
+          for mod in fetch(:enable_modules)
+            execute :drush, "en '#{mod}' -y"
+          end
+        end
+      end
+    end
+
+    desc 'Disable module(s)'
     task :disable do
       on roles(:app) do
         within release_path.join(fetch(:app_path)) do
