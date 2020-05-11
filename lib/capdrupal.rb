@@ -233,7 +233,7 @@ namespace :drupal do
         try = 0
         full_config_path = release_path.join(fetch(:config_path))
         within release_path.join(fetch(:app_path)) do
-          execute :drush, "config-import -y --source=#{full_config_path}"
+          execute :drush, "config-import -y"
         rescue
           try += 1
           try < 5 ? retry : raise
