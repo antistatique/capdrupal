@@ -149,23 +149,9 @@ namespace :deploy do
   after :updated, "drupal:permissions:recommended"
   after :updated, "drupal:permissions:writable_shared"
 
-
   # Fix the release permissions (due to Drupal restrictive permissions)
   # before deletting old release.
-  before :cleanup, :fix_permission do
-    on roles(:app) do
-      releases = capture(:ls, '-xtr', releases_path).split
-      if releases.count >= fetch(:keep_releases)
-        directories = (releases - releases.last(fetch(:keep_releases)))
-        if directories.any?
-          directories_str = directories.map do |release|
-            releases_path.join(release)
-          end.join(" ")
-          execute :chmod, '-R' ,'ug+w', directories_str
-        end
-      end
-    end
-  end
+  before :cleanup, "drupal:permissions:cleanup"
 end
 ```
 

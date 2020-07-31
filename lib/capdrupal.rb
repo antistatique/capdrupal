@@ -265,6 +265,22 @@ namespace :drupal do
       end
     end
 
+    desc 'Set cleanup permissions to allow deletion of releases'
+    task :cleanup do
+      on roles(:app) do
+        releases = capture(:ls, '-xtr', releases_path).split
+        if releases.count >= fetch(:keep_releases)
+          directories = (releases - releases.last(fetch(:keep_releases)))
+          if directories.any?
+            directories_str = directories.map do |release|
+              releases_path.join(release)
+            end.join(" ")
+            execute :chmod, '-R' ,'ug+w', directories_str
+          end
+        end
+      end
+    end
+
     desc 'Initalize shared path permissions'
     task :writable_shared do
       on roles(:app) do
