@@ -10,6 +10,13 @@ Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 8.x                   | d8     | 3.11               | 8.x
 8.x                   | d8     | 3.11               | 9.x
 
+## Prerequisites
+
+By default, Capdrupal will use **Drush** to run every Drupal commands. Therefore, your Drupal project **must** to require 
+`drush/drush`.
+
+You may add Drush as a dependency using `composer require drush/drush` in your Drupal project. Read more at [drush/drush](https://github.com/drush-ops/drush).
+
 ## Installation
 
 Add this line to your application's Gemfile:
