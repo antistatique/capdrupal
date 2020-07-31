@@ -181,7 +181,7 @@ namespace :drupal do
       on roles(:app) do
         within release_path.join(fetch(:app_path)) do
           execute :drush, "state:set system.maintenance_mode 1 -y"
-          execute :drush, 'cr'
+          execute :drush, 'cr', raise_on_non_zero_exit: false
         end
       end
     end
