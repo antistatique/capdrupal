@@ -221,14 +221,23 @@ namespace :drupal do
     desc 'Set cleanup permissions to allow deletion of releases'
     task :cleanup do
       on roles(:app) do
-        releases = capture(:ls, '-xtr', releases_path).split
-        if releases.count >= fetch(:keep_releases)
-          directories = (releases - releases.last(fetch(:keep_releases)))
+        releases = capture(:ls, '-x', release_path).split
+        valid, invalid = releases.partition { |e| /^\d{14}$/ =~ e }
+
+        if valid.count >= fetch(:keep_releases)
+          directories = (valid - valid.last(fetch(:keep_releases))).map do |release|
+            releases_path.join(release)
+          end
+          if test("[ -d #{current_path} ]")
+            current_release = capture(:readlink, current_path).to_s
+            if directories.include?(current_release)
+              directories.delete(current_release)
+            end
+          end
           if directories.any?
-            directories_str = directories.map do |release|
-              releases_path.join(release)
-            end.join(" ")
-            execute :chmod, '-R' ,'ug+w', directories_str
+            directories.each_slice(100) do |directories_batch|
+              execute :chmod, '-R' ,'ug+w', *directories_batch
+            end
           end
         end
       end
