@@ -240,15 +240,6 @@ namespace :drupal do
         end
       end
     end
-
-    desc 'Show proposed changes *before* importing configuration to the active stage'
-    task :import_preview do
-      on roles(:app) do
-        within release_path.join(fetch(:app_path)) do
-          execute :drush, 'config-import --preview=list'
-        end
-      end
-    end
   end
 
   namespace :permissions do
