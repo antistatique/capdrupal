@@ -44,14 +44,15 @@ namespace :drupal do
 
           unless test "[ -f #{backup} ]"
             warn "backup file #{backup} does not exist."
-            next ""
+            next
           end
 
           # Revert from backup.
+          execute :drush, 'sql:drop --yes'
           execute :drush, "sql:cli < #{backup}"
 
           # Delete the unziped backup.
-          execute :rm, "#{backup}"
+          execute :rm, backup
         end
       end
     end
