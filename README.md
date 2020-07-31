@@ -171,7 +171,7 @@ vi config/deploy/staging.rb
 
 ```ruby
 # staging.example.org
-set :deploy_to, '/home/example.org/www/staging.example.org'
+set :deploy_to, '/var/www/staging.example.org'
 
 # set a branch for this release
 set :branch, 'dev'
@@ -190,7 +190,7 @@ vi config/deploy/production.rb
 
 ```ruby
 # www.example.org
-set :deploy_to, '/home/example.org/www/example.org'
+set :deploy_to, '/var/www/example.org'
 
 # set a branch for this release
 set :branch, 'master'
