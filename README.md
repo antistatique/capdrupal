@@ -8,6 +8,7 @@ Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 --------------------- | ------ | ------------------ | --------------
 7.x                   | d7     | 2                  | 7.x
 8.x                   | d8     | 3.11               | 8.x
+8.x                   | d8     | 3.11               | 9.x
 
 ## Installation
 
