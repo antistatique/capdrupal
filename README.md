@@ -120,7 +120,7 @@ namespace :deploy do
   after "deploy:check:directories", "drupal:db:backup:check"
 
   # Backup the database before starting a deployment and rollback on fail.
-  # before :starting, "drupal:db:backup"
+  # after :updated, "drupal:db:backup"
   # before :failed, "drupal:db:rollback"
   # before :cleanup, "drupal:db:backup:cleanup"
 
@@ -172,8 +172,8 @@ set :branch, 'dev'
 # NOTE: If stage have different deploy_to
 # you have to copy those line for each <stage_name>.rb
 # See https://github.com/capistrano/composer/issues/22
-SSHKit.config.command_map[:composer] = shared_path.join("composer.phar")
-SSHKit.config.command_map[:drush] = shared_path.join("vendor/bin/drush")
+SSHKit.config.command_map[:composer] = -> { shared_path.join('composer.phar') }
+SSHKit.config.command_map[:drush] = -> { release_path.join('vendor/bin/drush') }
 ```
 
 ```shell
@@ -191,8 +191,8 @@ set :branch, 'master'
 # NOTE: If stage have different deploy_to
 # you have to copy those line for each <stage_name>.rb
 # See https://github.com/capistrano/composer/issues/22
-SSHKit.config.command_map[:composer] = shared_path.join("composer.phar")
-SSHKit.config.command_map[:drush] = shared_path.join("vendor/bin/drush")
+SSHKit.config.command_map[:composer] = -> { shared_path.join('composer.phar') }
+SSHKit.config.command_map[:drush] = -> { release_path.join('vendor/bin/drush') }
 ```
 
 Awesome, your configuration is complete !
