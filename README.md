@@ -7,8 +7,8 @@ This gem provides a number of tasks which are useful for deploying & managing Dr
 Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 --------------------- | ------ | ------------------ | --------------
 7.x                   | d7     | 2                  | 7.x
-8.x                   | d8     | 3.11               | 8.x
-8.x                   | d8     | 3.11               | 9.x
+8.x                   | main   | 3.14+              | 8.x
+8.x                   | main   | 3.14+              | 9.x
 
 ## Prerequisites
 
