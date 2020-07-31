@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['hello@antistatique.net']
 
   spec.description   = <<-DESC
-    A set of tasks for deploying Drupal 8 and Drupal 7 projects with Capistrano and the help of Drush.
+    A set of tasks for deploying Drupal 9, Drupal 8 and Drupal 7 projects with Capistrano and the help of Drush.
   DESC
   spec.summary       = 'A set of tasks for deploying and managing Drupal projects with Capistrano'
   spec.homepage      = %q{http://github.com/antistatique/capdrupal/}

@@ -1,7 +1,5 @@
 namespace :load do
   task :defaults do
-    set :install_composer, true
-    set :install_drush, true
     set :app_path, 'web'
     set :config_path, 'config/sync'
     set :backup_path, 'backups'
@@ -23,43 +21,6 @@ namespace :drush do
 end
 
 namespace :drupal do
-
-  desc 'Bootstrap Drupal site with drush site-install command'
-  task :bootstrap do
-    default = YAML.load_file("#{fetch(:config_path)}/system.site.yml")
-
-    ask(:drupal_uuid, default['uuid'])
-    ask(:drupal_site_name, default['name'])
-    ask(:drupal_admin_username, 'admin')
-    ask(:drupal_admin_passowrd, 'admin', echo: false)
-    ask(:drupal_admin_email, default['mail'])
-    ask(:site_name, "Site name")
-
-    warn <<-EOF
-
-    ************************** WARNING ****************************
-    If you type [yes], cap drupal:bootstrap will WIPE your database
-    any other input will cancel the operation.
-    ***************************************************************
-
-    EOF
-    ask :answer, 'Are you sure you want to WIPE your database?: '
-
-    if fetch(:answer) == 'yes'
-      on roles(:app) do
-        within release_path.join(fetch(:app_path)) do
-          execute :drush, 'si standard -y',
-            %(--site-name="#{fetch(:drupal_site_name)}"),
-            %(--account-name="#{fetch(:drupal_admin_username)}"),
-            %(--account-pass="#{fetch(:drupal_admin_passowrd)}"),
-            %(--account-mail="#{fetch(:drupal_admin_email)}")
-          execute :drush, %(config-set system.site uuid "#{fetch(:drupal_uuid)}" -y)
-        end
-      end
-    else
-      exit
-    end
-  end
 
   desc 'Run any drush command'
   task :drush do
@@ -83,14 +44,15 @@ namespace :drupal do
 
           unless test "[ -f #{backup} ]"
             warn "backup file #{backup} does not exist."
-            next ""
+            next
           end
 
           # Revert from backup.
+          execute :drush, 'sql:drop --yes'
           execute :drush, "sql:cli < #{backup}"
 
           # Delete the unziped backup.
-          execute :rm, "#{backup}"
+          execute :rm, backup
         end
       end
     end
