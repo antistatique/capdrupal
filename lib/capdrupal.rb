@@ -1,7 +1,5 @@
 namespace :load do
   task :defaults do
-    set :install_composer, true
-    set :install_drush, true
     set :app_path, 'web'
     set :config_path, 'config/sync'
     set :backup_path, 'backups'
