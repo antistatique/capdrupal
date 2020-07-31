@@ -221,7 +221,7 @@ namespace :drupal do
     desc 'Set cleanup permissions to allow deletion of releases'
     task :cleanup do
       on roles(:app) do
-        releases = capture(:ls, '-x', release_path).split
+        releases = capture(:ls, '-x', releases_path).split
         valid, invalid = releases.partition { |e| /^\d{14}$/ =~ e }
 
         if valid.count >= fetch(:keep_releases)
