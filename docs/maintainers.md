@@ -9,6 +9,7 @@ Checklist for making a release:
 
 - Write changelog 
 - Update version number in `capdrupal.gemspec`
+- Commit those 2 changes and create a new tag with the version number
 - Make a [new release with GitHub](https://github.com/antistatique/capdrupal/releases/new)
 - Build the gem with `gem build capdrupal.gemspec`
 - Push the gem to rubygems.org: `gem push capdrupal-X.X.X.gem` 
