@@ -25,7 +25,7 @@ You may add Drush as a dependency using `composer require drush/drush` in your D
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'capdrupal', '~>8.0'
+gem 'capdrupal', '~>3.0'
 ```
 
 And then execute:
