@@ -2,6 +2,9 @@
 
 This gem provides a number of tasks which are useful for deploying & managing Drupal projects with [Capistrano](https://github.com/capistrano/capistrano).
 
+[![Gem Version](https://badge.fury.io/rb/capdrupal.svg)](https://badge.fury.io/rb/capdrupal)
+[![Maintainability](https://api.codeclimate.com/v1/badges/e5db5a7f49d86ce5e418/maintainability)](https://codeclimate.com/github/antistatique/capdrupal/maintainability)
+
 # Capdrupal version
 
 Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
