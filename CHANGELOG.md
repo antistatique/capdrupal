@@ -1,6 +1,6 @@
 # Capdrupal Changelog
 
-## NEXT RELEASE
+## 3.0.0 (2020-08-07)
  - Support for Drupal 8 & Drupal 9
  - Complete code refactoring
 
