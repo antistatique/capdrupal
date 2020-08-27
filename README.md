@@ -78,7 +78,7 @@ require 'capistrano/deploy'
 require 'capistrano/composer'
 
 # Drupal Tasks.
-require 'capdrupal/capistrano'
+require 'capdrupal'
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined.
 Dir.glob('config/capistrano/tasks/*.rake').each { |r| import r }
