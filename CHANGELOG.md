@@ -1,5 +1,8 @@
 # Capdrupal Changelog
 
+## NEXT RELEASE
+ - Update the command `drupal:cache:clear` to be re-runnable after invoke
+
 ## 3.0.0 (2020-08-07)
  - Support for Drupal 8 & Drupal 9
  - Complete code refactoring

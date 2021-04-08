@@ -110,6 +110,7 @@ namespace :drupal do
           execute :drush, 'cr'
         end
       end
+      Rake::Task['drupal:cache:clear'].reenable
     end
   end
 
