@@ -1,6 +1,6 @@
 # Capdrupal Changelog
 
-## NEXT RELEASE
+## 3.0.1 (2020-08-07)
  - Update the command `drupal:cache:clear` to be re-runnable after invoke
 
 ## 3.0.0 (2020-08-07)
