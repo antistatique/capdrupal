@@ -2,6 +2,7 @@ namespace :load do
   task :defaults do
     set :app_path, 'web'
     set :config_path, 'config/sync'
+    set :site_path, 'default'
     set :backup_path, 'backups'
     set :keep_backups, 5
     set :enable_modules, []
@@ -248,12 +249,12 @@ namespace :drupal do
     task :writable_shared do
       on roles(:app) do
         within shared_path do
-          # "web/sites/default/files" is a shared dir and should be writable.
-          execute :chmod, '-R', '775', "#{fetch(:app_path)}/sites/default/files"
+          # "web/sites/#{fetch(:site_path)}/files" is a shared dir and should be writable.
+          execute :chmod, '-R', '775', "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files"
 
           # Remove execution for files, keep execution on folder.
-          execute 'find', "#{fetch(:app_path)}/sites/default/files", '-type f -executable -exec chmod -x {} \;'
-          execute 'find', "#{fetch(:app_path)}/sites/default/files", '-type d -exec chmod +sx {} \;'
+          execute 'find', "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type f -executable -exec chmod -x {} \;'
+          execute 'find', "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type d -exec chmod +sx {} \;'
         end
       end
     end
@@ -266,8 +267,8 @@ namespace :drupal do
         on release_roles :app do |server|
           ask(:answer, "Do you really want to download the files on the server to your local files? Nothings will be deleted but files can be ovewrite. (y/N)");
           if fetch(:answer) == 'y' then
-            remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/default/files/"
-            local_files_dir = "#{(fetch(:app_path))}/sites/default/files/"
+            remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/#{fetch(:site_path)}/files/"
+            local_files_dir = "#{(fetch(:app_path))}/sites/#{fetch(:site_path)}/files/"
             system("rsync --recursive --times --rsh=ssh --human-readable --progress --exclude='.*' --exclude='css' --exclude='js' #{server.user}@#{server.hostname}:#{remote_files_dir} #{local_files_dir}")
           end
         end
@@ -279,8 +280,8 @@ namespace :drupal do
       on release_roles :app do |server|
         ask(:answer, "Do you really want to upload your local files to the server? Nothings will be deleted but files can be ovewrite. (y/N)");
         if fetch(:answer) == 'y' then
-          remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/default/files/"
-          local_files_dir = "#{(fetch(:app_path))}/sites/default/files/"
+          remote_files_dir = "#{shared_path}/#{(fetch(:app_path))}/sites/#{fetch(:site_path)}/files/"
+          local_files_dir = "#{(fetch(:app_path))}/sites/#{fetch(:site_path)}/files/"
           system("rsync --recursive --times --rsh=ssh --human-readable --progress --exclude='.*' --exclude='css' --exclude='js' #{local_files_dir} #{server.user}@#{server.hostname}:#{remote_files_dir}")
         end
       end
