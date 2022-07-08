@@ -153,7 +153,7 @@ namespace :drupal do
     desc "Remove maintenance mode"
     task :off do
       on roles(:app) do
-        within release_path.join(fetch(:app_path)) do
+        within current_path.join(fetch(:app_path)) do
           execute :drush, "state:set system.maintenance_mode 0 -y"
           execute :drush, 'cr'
         end
