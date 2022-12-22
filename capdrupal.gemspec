@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'capdrupal'
-  spec.version       = '3.0.1'
+  spec.version       = '3.0.2'
   spec.authors       = ['Kevin Wenger', 'Yann Lugrin', 'Gilles Doge', 'Toni Fisler', 'Simon Perdrisat', 'Robert Wohleb', 'Kim Pepper']
   spec.email         = ['hello@antistatique.net']
 

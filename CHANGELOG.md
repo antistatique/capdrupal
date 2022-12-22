@@ -1,6 +1,8 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+
+## 3.0.2 (2022-12-22)
  - Allow Site directory to be configured
  - Optimize permissions related tasks
 
