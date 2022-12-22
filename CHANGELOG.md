@@ -2,6 +2,7 @@
 
 ## NEXT RELEASE
  - Allow Site directory to be configured
+ - Optimize permissions related tasks
 
 ## 3.0.1 (2020-08-07)
  - Update the command `drupal:cache:clear` to be re-runnable after invoke

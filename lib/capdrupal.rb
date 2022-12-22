@@ -211,11 +211,9 @@ namespace :drupal do
     task :recommended do
       on roles(:app) do
         within release_path.join(fetch(:app_path)) do
-          execute :chmod, '-R', '555', '.'
-
           # Remove execution for files, keep execution on folder.
-          execute 'find', './ -type f -executable -exec chmod -x {} \;'
-          execute 'find', './ -type d -exec chmod +x {} \;'
+          execute :find, './', '-type f ! -perm 444 -exec chmod 444 {} \;'
+          execute :find, './', '-type d ! -perm 555 -exec chmod 555 {} \;'
         end
       end
     end
@@ -249,12 +247,10 @@ namespace :drupal do
     task :writable_shared do
       on roles(:app) do
         within shared_path do
-          # "web/sites/#{fetch(:site_path)}/files" is a shared dir and should be writable.
-          execute :chmod, '-R', '775', "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files"
-
           # Remove execution for files, keep execution on folder.
-          execute 'find', "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type f -executable -exec chmod -x {} \;'
-          execute 'find', "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type d -exec chmod +sx {} \;'
+          # "web/sites/defaults/files" is a shared dir and should be writable.
+          execute :find, './', '-type f ! -perm 664 -exec chmod 664 {} \;'
+          execute :find, './', '-type d ! -perm 2775 -exec chmod 2775 {} \;'
         end
       end
     end
