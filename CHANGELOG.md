@@ -1,6 +1,7 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+ - Only files directory must have permissions fixed to be writable, not all shared files.
 
 ## 3.0.2 (2022-12-22)
  - Allow Site directory to be configured
