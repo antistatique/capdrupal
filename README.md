@@ -12,6 +12,7 @@ Capdrupal Gem Version | Branch | Capistrano Version | Drupal Version
 0.11.0                | d7     | 2                  | 7.x
 3.x                   | main   | 3.x                | 8.x
 3.x                   | main   | 3.x                | 9.x
+3.x                   | main   | 3.x                | 10.x
 
 ## Prerequisites
 
