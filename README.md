@@ -153,6 +153,10 @@ namespace :deploy do
 
   # Clear your Drupal 8 cache.
   after :updated, "drupal:cache:clear"
+  
+  # Obfuscate Drupal sensitive files by removing or by denying access to them.
+  # after :updated, "drupal:security:obscurity:files"
+  # after :updated, "drupal:security:obscurity:htaccess"
 
   # Disable the maintence on the Drupal project.
   after :updated, "drupal:maintenance:off"
