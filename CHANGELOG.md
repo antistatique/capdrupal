@@ -3,6 +3,7 @@
 ## NEXT RELEASE
  - add command `drupal:security:obscurity:files` to obfuscate Drupal sensitive files by deletion
  - add command `drupal:security:obscurity:htaccess` to obfuscate Drupal sensitive files by htaccess
+ - add command `drupal:security:audit` 
 
 ## 3.0.2 (2022-12-22)
  - Allow Site directory to be configured
