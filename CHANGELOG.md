@@ -1,6 +1,8 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+
+## 3.0.3 (2023-03-14)
  - Only files directory must have permissions fixed to be writable, not all shared files.
 
 ## 3.0.2 (2022-12-22)
