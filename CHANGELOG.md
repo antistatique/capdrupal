@@ -1,6 +1,8 @@
 # Capdrupal Changelog
 
-## NEXT RELEASE
+## NEXT RELEASE
+ - add command `drupal:security:obscurity:files` to obfuscate Drupal sensitive files by deletion
+ - add command `drupal:security:obscurity:htaccess` to obfuscate Drupal sensitive files by htaccess
 
 ## 3.0.3 (2023-03-14)
  - Only files directory must have permissions fixed to be writable, not all shared files.
