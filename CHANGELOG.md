@@ -1,6 +1,8 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+
+## 3.0.4 (2023-04-25)
  - add command `drupal:security:obscurity:files` to obfuscate Drupal sensitive files by deletion
  - add command `drupal:security:obscurity:htaccess` to obfuscate Drupal sensitive files by htaccess
 
