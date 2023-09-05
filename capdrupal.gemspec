@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'capdrupal'
-  spec.version       = '3.0.4'
+  spec.version       = '3.0.5'
   spec.authors       = ['Kevin Wenger', 'Yann Lugrin', 'Gilles Doge', 'Toni Fisler', 'Simon Perdrisat', 'Robert Wohleb', 'Kim Pepper']
   spec.email         = ['hello@antistatique.net']
 
@@ -25,5 +25,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'capistrano-composer', '~> 0.0.6'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'rake', '>= 12.3.3'
 end
