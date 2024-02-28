@@ -7,6 +7,27 @@ namespace :load do
     set :keep_backups, 5
     set :enable_modules, []
     set :disable_modules, []
+    set :security, {
+      # Path of files to be removed from the release path.
+      obscurity: [
+       "#{fetch(:app_path)}/core/install.php",
+       "#{fetch(:app_path)}/install.php",
+       "#{fetch(:app_path)}/update.php",
+       "#{fetch(:app_path)}/core/COPYRIGHT.txt",
+       "#{fetch(:app_path)}/core/CHANGELOG.txt",
+       "#{fetch(:app_path)}/core/INSTALL.mysql.txt",
+       "#{fetch(:app_path)}/core/INSTALL.pgsql.txt",
+       "#{fetch(:app_path)}/core/INSTALL.sqlite.txt",
+       "#{fetch(:app_path)}/core/MAINTAINERS.txt",
+       "#{fetch(:app_path)}/core/LICENSE.txt",
+       "#{fetch(:app_path)}/core/INSTALL.txt",
+       "#{fetch(:app_path)}/core/UPDATE.txt",
+       "#{fetch(:app_path)}/core/USAGE.txt",
+       "#{fetch(:app_path)}/CHANGELOG.txt",
+       "#{fetch(:app_path)}/INSTALL.txt",
+       "#{fetch(:app_path)}/example.gitignore",
+     ]
+    }
   end
 end
 
@@ -260,6 +281,40 @@ namespace :drupal do
           # "web/sites/defaults/files" is a shared dir and should be writable.
           execute :find, "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type f ! -perm 664 -exec chmod 664 {} \;'
           execute :find, "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type d ! -perm 2775 -exec chmod 2775 {} \;'
+        end
+      end
+    end
+  end
+
+  namespace :security do
+
+    desc 'Security by Obscurity'
+    namespace :obscurity do
+
+      desc 'Obfuscate Drupal sensitive files by deletion'
+      task :files do
+        on roles(:app) do
+          within release_path do
+            fetch(:security)[:obscurity].each do |file|
+              execute :rm, file, '-f'
+            end
+          end
+        end
+      end
+
+      desc 'Obfuscate Drupal sensitive files by htaccess'
+      task :htaccess do
+        on roles(:app) do
+          htaccessFile = release_path.join(fetch(:app_path)).join('.htaccess')
+
+          [
+            '## added during deploy',
+            '## Obfuscate Drupal sensitive files by denying access',
+            '<FilesMatch "(^API|CHANGELOG|COPYRIGHT|INSTALL|LICENSE|PATCHES|MAINTAINERS|README|TODO|UPGRADE|UPDATE|CHANGES|install|update|authorize).*\.(md|txt|php)$">',
+            '  Order deny,allow',
+            '  Deny from all',
+            '</FilesMatch>'
+          ].each { |line| execute "echo '#{line}' >> #{htaccessFile}" }
         end
       end
     end
