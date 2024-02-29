@@ -191,7 +191,7 @@ namespace :drupal do
     end
   end
 
-  desc 'Run several commands after performing a code deployment'
+  desc 'Run several commands after performing a code deployment (drush deploy)'
   task :deploy do
     on roles(:app) do
       within release_path.join(fetch(:app_path)) do
