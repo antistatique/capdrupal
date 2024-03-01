@@ -8,6 +8,38 @@ namespace :load do
     set :enable_modules, []
     set :disable_modules, []
     set :security, {
+      # URL to be checked for security
+      web_url: 'https://www.ovv.ch',
+      audit_must_headers: [
+        'x-xss-protection',
+        'referrer-policy',
+        'content-security-policy',
+        'strict-transport-security',
+      ],
+      audit_must_not_headers: [
+        'x-drupal-cache',
+        'x-drupal-dynamic-cache',
+        'x-generator',
+      ],
+      # Sensitive URLs from root (web_url) that should not be accessible.
+      audit_must_not_url_fragments: [
+       "core/install.php",
+       "install.php",
+       "update.php",
+       "core/COPYRIGHT.txt",
+       "core/CHANGELOG.txt",
+       "core/INSTALL.mysql.txt",
+       "core/INSTALL.pgsql.txt",
+       "core/INSTALL.sqlite.txt",
+       "core/MAINTAINERS.txt",
+       "core/LICENSE.txt",
+       "core/INSTALL.txt",
+       "core/UPDATE.txt",
+       "core/USAGE.txt",
+       "CHANGELOG.txt",
+       "INSTALL.txt",
+       "example.gitignore",
+      ],
       # Path of files to be removed from the release path.
       obscurity: [
        "#{fetch(:app_path)}/core/install.php",
@@ -287,6 +319,51 @@ namespace :drupal do
   end
 
   namespace :security do
+
+  desc "Check Drupal recommended security layers"
+    task :audit do
+      run_locally do
+
+        # Check for sensitives files.
+        info "=================================="
+        info "Ensure all obfuscated files are properly not accessible."
+        fetch(:security)[:audit_must_not_url_fragments].each do |url_fragment|
+          page_url = "#{fetch(:security)[:web_url]}/#{url_fragment}"
+
+          info "Fetching #{page_url} ..."
+          status_code = capture(:curl, '-LI', page_url, '-o /dev/null -w \'%{http_code}\n\' -s')
+          if status_code == '200' then
+            error "Page respond with status #{status_code}."
+          else
+            info "Page respond with status #{status_code}."
+          end
+        end
+
+        # Check for debug Headers.
+        info "=================================="
+        info "Ensure sensitive or debug Headers are disabled."
+        fetch(:security)[:audit_must_not_headers].each do |header|
+          header_value = capture(:curl, '-LI', fetch(:security)[:web_url], "-o /dev/null -w '%header{#{header}}' -s")
+
+          if header_value == '' then
+            error "Header #{header} contains value #{header_value}."
+          end
+        end
+
+        # Check for security Headers.
+        info "=================================="
+        info "Ensure security Headers are enabled."
+        fetch(:security)[:audit_must_headers].each do |header|
+          header_value = capture(:curl, '-LI', fetch(:security)[:web_url], "-o /dev/null -w '%header{#{header}}' -s")
+
+          if header_value == '' then
+            error "Header #{header} should be configured."
+          else
+            info "Header #{header} is configured with #{header_value}."
+          end
+        end
+      end
+    end
 
     desc 'Security by Obscurity'
     namespace :obscurity do
