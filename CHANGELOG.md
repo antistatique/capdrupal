@@ -1,6 +1,7 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+ - add command `drupal:drush:deploy` to run official drush deploy command
 
 ## 3.0.4 (2023-04-25)
  - add command `drupal:security:obscurity:files` to obfuscate Drupal sensitive files by deletion
