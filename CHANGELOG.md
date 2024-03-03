@@ -3,6 +3,9 @@
 ## NEXT RELEASE
  - add command `drupal:drush:deploy` to run official drush deploy command
 
+## 3.0.5 (2023-09-05)
+ - Remove `rake` dependency following security issue (to follow capitrano requirement)
+
 ## 3.0.4 (2023-04-25)
  - add command `drupal:security:obscurity:files` to obfuscate Drupal sensitive files by deletion
  - add command `drupal:security:obscurity:htaccess` to obfuscate Drupal sensitive files by htaccess
