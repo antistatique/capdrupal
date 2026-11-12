@@ -242,8 +242,8 @@ namespace :drupal do
       on roles(:app) do
         within release_path.join(fetch(:app_path)) do
           # Remove execution for files, keep execution on folder.
-          execute :find, './', '-type f ! -perm 444 -exec chmod 444 {} \;'
-          execute :find, './', '-type d ! -perm 555 -exec chmod 555 {} \;'
+          execute :find, './', '-type f ! -perm 444 -exec chmod 444 {} +'
+          execute :find, './', '-type d ! -perm 555 -exec chmod 555 {} +'
         end
       end
     end
@@ -279,8 +279,8 @@ namespace :drupal do
         within shared_path do
           # Remove execution for files, keep execution on folder.
           # "web/sites/defaults/files" is a shared dir and should be writable.
-          execute :find, "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type f ! -perm 664 -exec chmod 664 {} \;'
-          execute :find, "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type d ! -perm 2775 -exec chmod 2775 {} \;'
+          execute :find, "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type f ! -perm 664 -exec chmod 664 {} +'
+          execute :find, "#{fetch(:app_path)}/sites/#{fetch(:site_path)}/files", '-type d ! -perm 2775 -exec chmod 2775 {} +'
         end
       end
     end

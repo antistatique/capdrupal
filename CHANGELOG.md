@@ -1,6 +1,7 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+ - Speed up `drupal:permissions:recommended` and `drupal:permissions:writable_shared` by batching `chmod` calls (`find -exec ... {} +`) - #47
  - add command `drupal:drush:deploy` to run official drush deploy command
 
 ## 3.0.5 (2023-09-05)
