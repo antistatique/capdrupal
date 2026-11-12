@@ -1,6 +1,7 @@
 # Capdrupal Changelog
 
 ## NEXT RELEASE
+ - Speed up `drupal:permissions:cleanup` by only making directories writable (`find -type d -exec chmod ug+w {} +`) instead of `chmod -R` on every file
  - Speed up `drupal:permissions:recommended` and `drupal:permissions:writable_shared` by batching `chmod` calls (`find -exec ... {} +`) - #47
  - add command `drupal:drush:deploy` to run official drush deploy command
 

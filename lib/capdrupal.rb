@@ -265,8 +265,11 @@ namespace :drupal do
             end
           end
           if directories.any?
+            # Deleting a file only requires write permission on its parent
+            # directory, so only directories need to be made writable.
+            # Skipping files avoids one chmod per file on large releases.
             directories.each_slice(100) do |directories_batch|
-              execute :chmod, '-R' ,'ug+w', *directories_batch
+              execute :find, *directories_batch, '-type d -exec chmod ug+w {} +'
             end
           end
         end
